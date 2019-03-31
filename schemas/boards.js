@@ -18,6 +18,10 @@ module.exports = new mongoose.Schema({
         type:mongoose.Schema.Types.ObjectId,
         ref:'Users'
     },
+    comments: {//存储对这个item评论的数组
+        type:Array,
+        default:[]
+    },
     views:{//浏览量
         type:Number,
         default:0

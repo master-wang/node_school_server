@@ -8,14 +8,25 @@ var responData;
 const multer = require('multer');
 const path = require('path');
 const lastdir = path.resolve(__dirname, '..');
+var Bod_imgs = [];
+var B_path = '/public/upimgs/';
+
 var imgpath = '/public/upimgs/';
+var user_img = ''
 var storage = multer.diskStorage({
     destination: path.join(lastdir,'/public/upimgs'),
 
     filename: function (req, file, cb) {
         var str = file.originalname.split('.');
         var imgname = Date.now()+'.'+str[1];
-        imgpath = imgpath + imgname;
+        //处理单张图片
+        user_img = imgname;
+        //imgpath = imgpath + imgname;
+        //处理多张图片
+        B_path = B_path + imgname;
+        Bod_imgs.push(B_path);
+        B_path = '/public/upimgs/';
+
         cb(null, imgname);
     }
 })
@@ -150,8 +161,10 @@ router.post('/user/UpateInfo',function(req,res){
 router.post('/user/UpateInfoImg',upload.single('photo'),function(req,res){
     var id = req.userInfo._id
     responData.message = '上传成功';
-    responData.imgpath = imgpath;
+    responData.imgpath = imgpath +user_img;
     console.log("更新个人头像路径："+responData.imgpath);
+    imgpath=imgpath +user_img;
+    console.log();
     User.update({
         _id:id
     },{
@@ -177,53 +190,42 @@ router.get('/user/logout',function(req,res){
     responData.message = '退出成功！';
     res.json(responData);
 })
-//展示评论
-// router.get('/comment',function(req,res){
-//     var contentId = req.query.contentId || '';
-//     Content.findOne({
-//         _id:contentId
-//     }).then(function(content){
-//         responData.data = content;
-//         res.json(responData);
-//     })
-// })
-
 //添加公告
 router.post('/boards/addInfo',function(req,res){
     var item = req.body.item;
     var b_theme = req.body.b_theme;
     var b_disc = req.body.b_disc;
     var _id = req.body._id;
+    console.log("---------------------------------------------------");
     console.log(item+"---"+b_theme+"--"+b_disc+"---"+_id);
 
-    new Boards({
-        item: item,
-        b_theme: b_theme,
-        b_disc:b_disc,
-        b_release: req.userInfo._id.toString(),
-    }).save().then(function(Boardinfo){
-        console.log(Boardinfo);
-        responData.message = '发布公告成功！';
-        req.userInfo.addBoard_id= Boardinfo._id.toString();
-        console.log(req.userInfo,"info");
-        res.json(responData);
-        return;
-    });
-})
-//添加公告图片
-router.post('/boards/addInfoImg',upload.array("file",20),function(req,res){
-    console.log(req.userInfo,"img");
-    var addBoard_id= req.userInfo.addBoard_id;
-    var arr = [];
-    for(var i in req.files){
-        
-        arr.push(req.files[i].path);
-    }
-    console.log(arr);
-    // Boards.update({
+    // new Boards({
+    //     item: item,
+    //     b_theme: b_theme,
+    //     b_disc:b_disc,
+    //     b_release: req.userInfo._id.toString(),
+    // }).save().then(function(Boardinfo){
+    //     console.log(Boardinfo);
+    //     responData.message = '发布公告成功！';
+    //     req.cookies.set('addBoard_id',JSON.stringify(
+    //         {
+    //             _id:Boardinfo._id
+    //         }
+    //     ));
+    //     // req.userInfo.addBoard_id= Boardinfo._id.toString();
+    //     console.log(req.addBoard_id,"info");
+    //     res.json(responData);
+    //     return;
+    // });
+
+    // var addBoard_id= req.addBoard_id;
+    // Boards.updateOne({
     //     _id:addBoard_id
     // },{
-    //     b_img:arr
+    //     item: item,
+    //     b_theme: b_theme,
+    //     b_disc:b_disc,
+    //     b_release: req.userInfo._id.toString(),
     // }).then(function(info){
     //     if(!info){
     //         responData.message = '公告上传失败！';
@@ -231,30 +233,128 @@ router.post('/boards/addInfoImg',upload.array("file",20),function(req,res){
     //         return;
     //     }
     //     responData.message = '公告上传成功';
-    //     responData.userInfo = userInfo;
     //     res.json(responData);
     //     return;  
     // })
 })
+//添加公告图片
+router.post('/boards/addInfoImg',upload.array("file",20),function(req,res){
+    console.log(req.addBoard_id,"img");
+    console.log(Bod_imgs);
+    var addBoard_id= req.addBoard_id;
+
+    var item = req.body.item;
+    var b_theme = req.body.b_theme;
+    var b_disc = req.body.b_disc;
+    var _id = req.body._id;
+    console.log("---------------------------------------------------");
+    console.log(item+"---"+b_theme+"--"+b_disc+"---"+_id);
+
+    new Boards({
+        b_img:Bod_imgs,
+        item:item,
+        b_theme:b_theme,
+        b_disc,b_disc,
+        b_release:req.userInfo._id.toString()
+    }).save().then(function(Boardinfo){
+        console.log(Boardinfo);
+        responData.message = '图片上传成功成功！';
+        req.cookies.set('addBoard_id',JSON.stringify(
+            {
+                _id:Boardinfo._id
+            }
+        ));
+        res.json(responData);
+        return;
+    });
+})
+//公告的请求
+router.get('/boards/getAllBoardsList',function(req,res){
+    Boards.find().sort({_id:-1}).populate('b_release').then(function(BoardsList){
+        responData.message = '请求公告数据成功！';
+        responData.BoardsList = BoardsList;
+        res.json(responData);
+    })
+})
+//获取某个item公告的信息
+router.post('/boards/getItemBoardsInfo',function(req,res){
+    var item = req.body.item;
+    console.log(item);
+    Boards.find({
+        item:item
+    }).sort({_id:-1}).populate('b_release').then(function(b_info){
+        console.log("--------------------------");
+        console.log(b_info);
+        responData.message = '请求'+item+'公告数据成功！';
+        responData.BoardsList = b_info;
+        res.json(responData);
+    })
+})
+//删除自己发的item
+router.get('/boards/delete',function(req,res){
+    var id=req.query.id || '';
+    console.log(id);
+    Boards.remove({
+        _id:id
+    }).then(function(){
+        responData.message = '删除成功！';
+        res.json(responData);
+    })
+    
+})
 //评论提交
 
-router.post('/comment/post',function(req,res){
-    var contentId = req.body.contentId || '';
+router.post('/boards/comment/post',function(req,res){
+    var b_Id = req.body.b_Id || '';
     var postData = {
         username:req.userInfo.username,
         postTime:new Date(),
         content:req.body.messageContent
     };
-    Content.findOne({
-        _id:contentId
+    Boards.findOne({
+        _id:b_Id
     }).then(function(content){
-        content.comments.push(postData);
+        content.comments.unshift(postData);
         return content.save();
     }).then(function(newContent){
-        
         responData.message = '评论成功！';
-        responData.data = newContent;
+        responData.newContent = newContent;
         res.json(responData);
+    })
+
+})
+//删除自己的评论
+router.post('/boards/comment/delete',function(req,res){
+    var c = req.body.c || '';
+    var b_Id = req.body.b_Id || '';
+    console.log(c+"--"+b_Id);
+    console.log(c);
+    Boards.findOne({
+        _id:b_Id
+    }).then(function(content){
+        var length = content.comments;
+        for (var i = 0; i < length; i++) {
+            if (content.comments[i] == c) {
+                console.log(content.comments[i])
+                if (i == 0) {
+                    content.comments.shift(); //删除并返回数组的第一个元素
+                    return content.save();
+                }
+                else if (i == length - 1) {
+                    content.comments.pop();  //删除并返回数组的最后一个元素
+                    return content.save();
+                }
+                else {
+                    content.comments.splice(i, 1); //删除下标为i的元素
+                    return content.save();
+                }
+            }
+        }
+    }).then(function(newContent){
+        console.log(newContent);
+        // responData.message = '评论成功！';
+        // responData.newContent = newContent;
+        // res.json(responData);
     })
 
 })

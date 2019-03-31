@@ -109,20 +109,166 @@ $(function(){
     }
     var boardShow={
         template : `
-            <div>
-                <h1>boardShow</h1>
-                <div>
-                    公告展示
+            <div  class="jumbotron">
+                <h3><label for="">
+                公告类别：<select name="" v-model="item" @change="getBoardInfo()" class="form-control">
+                        <option value="管理员公告">管理员公告</option>
+                        <option value="找情侣">找情侣</option>
+                        <option value="买卖物品">买卖物品</option>
+                        <option value="约一起看电影">约一起看电影</option>
+                        <option value="约一起学习">约一起学习</option>
+                        <option value="表白墙">表白墙</option>
+                        <option value="兼职墙">兼职墙</option>
+                    </select>
+                    </label>
+                </h3>
+                <div v-for="board in boardsList" style="margin-top:20px;border:2px solid red">
+                    <h3><img :src="board.b_release.head_img">/{{board.b_release.nicheng}}/{{board.b_release.faculty}}
+                    /{{board.b_release.Class}}/{{board.b_cTime}}/{{board.views}}
+                    </h3>
+                    <h3>{{board.b_theme}}</h3>
+                    <h3>{{board.b_disc}}</h3>
+                    <h3><img v-for="img in board.b_img" :src="img"></h3>
+                    <button v-if="board.b_release._id==userInfo._id" type="button" class="btn btn-danger" @click="BoardsDelete(board._id)">删除</button>
+                    <div style="border:1px solid blue">
+                        <p v-for="c in board.comments">昵称:<span>{{c.username}}</span>评论：<span>{{c.content}}</span>时间：<span>{{c.postTime}}</span>
+                          <button v-if="board.b_release._id==userInfo._id" type="button" class="btn btn-danger" @click="conmentDelete(c,board._id)">删除</button>
+                        </p>
+                        <textarea v-model="addcomInfo" name="" id="" cols="30" rows="10"></textarea>
+                        <button class="btn btn-primart" @click="addComment(board._id)">发表</button>
+                    </div>
                 </div>
             </div>
-        `
+        `,
+        data:function(){
+            return {
+                boardsList:[],
+                userInfo:{},
+                item:'',
+                addcomInfo:''
+            }
+        },
+        methods:{
+            getBoardInfo(){
+                var that = this;
+                console.log(that.item);
+                var item = that.item;
+                $.ajax({
+                    type:'post',
+                    url:'/api/boards/getItemBoardsInfo',
+                    data:{
+                        item
+                    },
+                    dataType:'json',
+                    success:function(result){
+                        that.boardsList = result.BoardsList;
+                    }
+                });
+            },
+            getAllBoardsList(){
+                var that = this;
+                $.ajax({
+                    type:'get',
+                    url:'/api/boards/getAllBoardsList',
+                    success:function(result){
+                        that.boardsList = result.BoardsList;
+                        
+                    }
+                });
+            },
+            BoardsDelete(board_id){
+                var that = this;
+                $.ajax({
+                    type:'get',
+                    url:'/api/boards/delete?id='+board_id,
+                    success:function(result){
+                        that.$router.push({
+                            path: '/scgoolBoard/successInfo',
+                            query: {
+                            "msg":"删除成功！"
+                            }
+                        })
+                        
+                    }
+                });
+            },
+            addComment(b_Id){
+                var that = this;
+                if(this.addcomInfo==''){
+                    alert("评论不能为空！");
+                }else{
+                    $.ajax({
+                        type:'post',
+                        url:'/api/boards/comment/post',
+                        data:{
+                            b_Id,
+                            messageContent:that.addcomInfo
+                        },
+                        dataType:'json',
+                        success:function(result){
+                            console.log(result);
+                            that.addcomInfo='';
+                            that.boardsList.forEach((element,index)=> {
+                                if(element._id==b_Id){
+                                    that.boardsList[index]=result.newContent
+                                    console.log(index);
+                                    console.log(that.boardsList[index]);
+                                }
+                            });
+                        }
+                    });
+                }
+            },
+            conmentDelete(c,b_Id){
+                var that = this;
+                $.ajax({
+                    type:'post',
+                    url:'/api/boards/comment/delete',
+                    data:{
+                        c,
+                        b_Id
+                    },
+                    dataType:'json',
+                    success:function(result){
+                        console.log(result);
+                        that.addcomInfo='';
+                        that.boardsList.forEach((element,index)=> {
+                            if(element._id==b_Id){
+                                that.boardsList[index]=result.newContent
+                                console.log(index);
+                                console.log(that.boardsList[index]);
+                            }
+                        });
+                    }
+                });
+            },
+            formateData(d){
+                var date = new Date(d);
+                return date.getFullYear()+'年'+date.getMonth()+'月'+date.getDate()+'时'+date.getHours() +':'+date.getMinutes()+':'+date.getSeconds();
+            }
+        },
+        created() {
+            this.userInfo=JSON.parse(localStorage.getItem('userInfo'));
+            this.getAllBoardsList();
+        },
     }
     var boardAdd={
         template : `
             <div>
                 <h1>发布我的公告</h1>
                 <div>
-                    <label for="">
+                    <label for="" v-if="userInfo.isAdmin">
+                        公告类别：<select name="" v-model="boardInfo.item"  class="form-control">
+                                <option value="管理员公告">管理员公告</option>
+                                <option value="找情侣">找情侣</option>
+                                <option value="买卖物品">买卖物品</option>
+                                <option value="约一起看电影">约一起看电影</option>
+                                <option value="约一起学习">约一起学习</option>
+                                <option value="表白墙">表白墙</option>
+                                <option value="兼职墙">兼职墙</option>
+                            </select>
+                    </label>
+                    <label for="" v-if="!userInfo.isAdmin">
                         公告类别：<select name="" v-model="boardInfo.item"  class="form-control">
                                 <option value="找情侣">找情侣</option>
                                 <option value="买卖物品">买卖物品</option>
@@ -131,7 +277,7 @@ $(function(){
                                 <option value="表白墙">表白墙</option>
                                 <option value="兼职墙">兼职墙</option>
                             </select>
-                    </label> 
+                    </label>
                     <br />
                     <label for="">
                         主题：<input  v-model="boardInfo.b_theme"  type="text" class="form-control" placeholder="主题">
@@ -141,7 +287,7 @@ $(function(){
                         描述：<input  v-model="boardInfo.b_disc"  type="text" class="form-control" placeholder="描述">
                     </label>
                     <br />
-                    <label for="exampleInputFile">头像
+                    <label for="">照片
                             <input type="file" name="file" id="updateBoard_imgs" accept="image/gif, image/jpeg,image/png,image/jpg" multiple>
                             <img src="" height="100px;width:100px">
                         <p class="help-block">最多三张图片</p>
@@ -149,7 +295,7 @@ $(function(){
                 </div>
                 <div>
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" @click="post_boardInfo()">发布</button>
+                    <button type="button" class="btn btn-primary" @click="post_boardInfoImg()">发布</button>
                 </div>
             </div>
             
@@ -161,7 +307,8 @@ $(function(){
                     b_theme:'',
                     b_disc:'',
                     _id:''
-                }
+                },
+                userInfo:{}
             }
         },
         methods:{
@@ -170,32 +317,42 @@ $(function(){
                 this.boardInfo._id=this.userInfo._id.toString();
                 var that=this;
                 let x = document.getElementById('updateBoard_imgs').files[0];
-                console.log(x);
                 if(this.boardInfo.b_theme==''||this.boardInfo.b_disc==''){
                     alert("主题和描述不能为空！");
                 }else{
                     if(!x){
-                        console.log("未选择头像");
-                        $.ajax({
-                            type:'post',
-                            url:'/api/boards/addInfo',
-                            data:that.boardInfo,
-                            dataType:'json',
-                            success:function(result){
-                                var Boardinfo_Id = result.Boardinfo_Id;
-                                that.post_boardInfoImg();
-                            }
-                        });
+                        console.log("未选择图片，默认图片");
+                        // $.ajax({
+                        //     type:'post',
+                        //     url:'/api/boards/addInfo',
+                        //     data:that.boardInfo,
+                        //     dataType:'json',
+                        //     success:function(result){
+                        //         that.$router.push({
+                        //             path: '/successInfo',
+                        //             query: {
+                        //             "msg":"公告上传成功！"
+                        //             }
+                        //         })
+                               
+                        //     }
+                        // });
                     }else{
                         $.ajax({
                             type:'post',
-                            url:'/api/user/UpateInfo',
+                            url:'/api/boards/addInfo',
                             data:that.update_userInfo,
                             dataType:'json',
                             success:function(result){
+                                var Boardinfo_Id = result.Boardinfo_Id;
                                 console.log("ready img");
                                 console.log(result);
-                                that.post_boardInfoImg();
+                                that.$router.push({
+                                    path: '/cgoolBoard/successInfo',
+                                    query: {
+                                    "msg":"公告上传成功！"
+                                    }
+                                })
                             }
                         });
                     }
@@ -203,33 +360,61 @@ $(function(){
                 
             },
             post_boardInfoImg(){
-                var that=this;
-                let x = document.getElementById('updateBoard_imgs').files[0];
-                let params = new FormData() ; //创建一个form对象
-                params.append('file',x,x.name);  //append 向form表单添加数据
-                console.log(params);
-                $.ajax({
-                    type:'post',
-                    url:'/api/boards/addInfoImg',
-                    data:params,
-                    dataType: 'JSON',  
-                    cache: false,  
-                    processData: false,  //不处理发送的数据，因为data值是FormData对象，不需要对数据做处理 
-                    contentType: false,
-                    success:function(result){
-                        console.log(result);
-                        localStorage.setItem('userInfo',JSON.stringify(result.userInfo));
-                        vm.userInfo=result.userInfo;
-                        that.$router.push({
-                            path: '/successInfo',
-                            query: {
-                              "msg":"更新个人资料成功！"
+                if(!this.userInfo){
+                    alert("您还没有登录，请先登录");
+                }else{
+                    var that=this;
+                    let x = document.getElementById('updateBoard_imgs').files[0];
+                    // let params = new FormData() ; //创建一个form对象
+                    // params.append('file',x,x.name);  //append 向form表单添加数据
+                    // console.log(params);
+                    if(this.boardInfo.b_theme==''||this.boardInfo.b_disc==''){
+                        alert("主题和描述不能为空！");
+                    }else{
+                        if(!x){
+                            alert("照片未选择！")
+                       }else{
+                            var formData = new FormData();
+                            for(var index = 0; index < $('#updateBoard_imgs')[0].files.length; index++){
+                                formData.append('file', $('#updateBoard_imgs')[0].files[index]);
                             }
-                          })
+                            this.userInfo=JSON.parse(localStorage.getItem('userInfo'));
+                            this.boardInfo._id=this.userInfo._id.toString();
+            
+                            formData.append('item', that.boardInfo.item);
+                            formData.append('b_theme', that.boardInfo.b_theme);
+                            formData.append('b_disc', that.boardInfo.b_disc);
+                            formData.append('_id', that.boardInfo.item);
+                            console.log(formData);
+                            $.ajax({
+                                type:'post',
+                                url:'/api/boards/addInfoImg',
+                                data:formData,
+                                dataType: 'JSON',  
+                                cache: false,  
+                                processData: false,  //不处理发送的数据，因为data值是FormData对象，不需要对数据做处理 
+                                contentType: false,
+                                success:function(result){
+                                    console.log(result);
+                                    // that.post_boardInfo();
+                                    that.$router.push({
+                                        path: '/scgoolBoard/successInfo',
+                                        query: {
+                                        "msg":"公告上传成功！"
+                                        }
+                                    })
+                                }
+                            });
+                       }
                     }
-                });
+                }
+                
+                
             }
-        }
+        },
+        created() {
+            this.userInfo=JSON.parse(localStorage.getItem('userInfo'));    
+        },
     }
     var scgoolBoard={
         template : `
@@ -242,7 +427,9 @@ $(function(){
                     </ul>
                     </div>
                 </div>
+                <div class="article_main">
                 <router-view></router-view>
+                </div>
             </div>
         `,
         data:function(){
@@ -421,6 +608,11 @@ $(function(){
                     component : boardAdd
         
                 },
+                {
+                    path : '/scgoolBoard/successInfo',
+                    component : successInfo
+        
+                },
             ]
 
         },
@@ -504,7 +696,7 @@ $(function(){
                     $(".up_down_img").eq(0).attr("src",'/public/imgs/down.png');
                     this.up_down=!this.up_down;
                 }else{
-                    $(".bottom").animate({top: '950px'}, "slow");
+                    $(".bottom").animate({top: '96%'}, "slow");
                     $(".up_down_img").eq(0).attr("src",'/public/imgs/up.png');
                     this.up_down=!this.up_down;
                 }

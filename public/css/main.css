@@ -81,8 +81,15 @@ body{
 .article{
     float: left;
     margin-left:200px;
-    width: 60%;
+    width: 800px;
+    height: 650px;
     border: 1px solid #ccc;
+}
+.article_main{
+    width: 800px;
+    height: 650px;
+    overflow-x: hidden;
+    overflow-y: scroll;
 }
 .article .demo{
     margin-top: 10px;

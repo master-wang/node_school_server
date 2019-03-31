@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+	<title>公告</title>
+	<!-- <link rel="stylesheet" type="text/css" href="gonggao.css"> -->
+	<style type="text/css">
+		*{
+			margin:0;
+			padding:0;
+		}.notice{
+			width:800px;
+			height: 650px;
+			margin:100px auto;
+			border:1px red solid;
+			position: relative;
+		}.theme{
+			width:800px;
+			height: 80px;
+			text-align: center;
+			border:1px red solid;
+		}.notice .content{
+			width: 400px;
+			height: 150px;
+			left: 300px;
+			top: 130px;
+			border:1px red solid;
+			position: absolute;
+		}.content ul{
+			margin:20px 40px;
+		}
+		.content ul li{
+			list-style-type: none;
+		}.content li a{
+			text-decoration:none;
+		}.notice .discuss{
+			width: 510px;
+			height: 100px;
+			position: absolute;
+			left: 270px;
+			top: 330px;
+			border:1px red solid;
+		}.notice .discuss img,.notice .discuss_box img{
+			width: 50px;
+			height: 50px;
+			margin-right: 10px;
+			border-radius: 50%;
+		}.notice .discuss_box{
+			width:650px;
+			position: absolute;
+			height: 200px;
+			top: 450px;
+			left: 50px;
+			
+		}.notice .discuss_box_talk{
+			border:1px red solid;
+			height: 50px;
+			left: 200px;
+		} .discuss_box_talk .talk1{
+			left: 80px;
+			position: relative;
+			top: -50px;
+		}.discuss_box_talk .talk2{
+			left: 450px;
+			position: relative;
+			top: -70px;
+		}.sideimg{
+			position: absolute;
+			top: 120px;
+			left: 10px;
+		}.sideimg img{
+			width: 250px;
+			height: 300px;
+		}
+
+
+	</style>
+</head>
+<body>
+<div class="notice">
+	<div class="theme">
+		<h1>主题......</h1>
+	</div>
+	<div class="sideimg">
+			<img src="images/img.jpg" alt="">
+	</div>
+	<div class="content">
+		<ul>
+			<li>【时间1】<a href="">内容............</a><span>发布人</span></li>
+			<li>【时间2】<a href="">内容............</a><span>发布人</span></li>
+			<li>【时间3】<a href="">内容............</a><span>发布人</span></li>
+			<li>【时间4】<a href="">内容............</a><span>发布人</span></li>
+		</ul>
+		<!-- 这段是多条公告还是 ？-->
+	</div>
+	<div class="discuss">
+		<h4>用户评论 (已有3+评论)</h4><br>
+		<img src="images/img.jpg" alt="">
+		<textarea cols="50" rows="2"></textarea>
+		<span>发表评论</span>
+	 </div>
+	 <div class="discuss_box" id="">
+		<h4>最新评论</h4>
+			<div class="discuss_box_talk">
+				<img src="images/img.jpg" alt="">
+				<div class="talk1">
+					<p><a href="#">五彩之首:</a>感谢QAQ</p>
+					<span>59分钟前</span>
+				</div>
+				<div class="talk2">
+					<img src="" alt="">
+					<span>回复</span>
+					<img src="" alt="">
+					<span>点赞 0</span>
+				</div>
+			</div>
+			<div class="discuss_box_talk">
+				<img src="images/img.jpg" alt="">
+				<div class="talk1">
+					<p><a href="#">五彩之首:</a>感谢QAQ</p>
+					<span>59分钟前</span>
+				</div>
+				<div class="talk2">
+					<img src="" alt="">
+					<span>回复</span>
+					<img src="" alt="">
+					<span>点赞 0</span>
+				</div>
+			</div>
+			<div class="discuss_box_talk">
+				<img src="images/img.jpg" alt="">
+				<div class="talk1">
+					<p><a href="#">五彩之首:</a>感谢QAQ</p>
+					<span>59分钟前</span>
+				</div>
+				<div class="talk2">
+					<img src="" alt="">
+					<span>回复</span>
+					<img src="" alt="">
+					<span>点赞 0</span>
+				</div>
+			</div>
+
+	 </div>
+	 <span>没有更多评论了</span>
+</div>
+</body>
+</html>

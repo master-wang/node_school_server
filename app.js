@@ -37,7 +37,7 @@ app.use(function(req,res,next){
             console.log("try cookies");
             console.log(req.cookies.get('userInfo'));
             req.userInfo = JSON.parse(req.cookies.get('userInfo'));
-            req.userInfo.addBoard_id='';
+            req.addBoard_id=JSON.parse(req.cookies.get('addBoard_id'));
             User.findById(req.userInfo._id).then(function(userInfo){
             
                 req.userInfo.isAdmin = Boolean(userInfo.isAdmin);
