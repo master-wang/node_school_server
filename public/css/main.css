@@ -1,0 +1,176 @@
+*{
+    margin: 0;
+    padding: 0;
+}
+body{
+    background: #ccc;
+    overflow: hidden;
+}
+.top{
+    width: 100%;
+    height: 1014px;
+    background-color: aqua;
+}
+.top h1{
+    width: 100%;
+    text-align: center;
+    position: absolute;
+    z-index: 1000;
+    color: azure;
+}
+.list{
+    width: 100%;
+    height: 80px;
+    text-align: center;
+    background: rgb(70, 14, 14);
+}
+
+.list img{
+    width: 40px;
+    height: 20px;
+    cursor: pointer;
+}
+.list_mid{
+    margin-left: 30%;
+    width: 100%;
+    height: 50px;
+    vertical-align:50px;
+}
+.list ul{
+    list-style: none;
+    vertical-align:50px;
+    
+}
+.list ul li{
+    float: left;
+    margin-left: 10px;
+    height: 50px;
+    width: 120px;
+    text-align: center;
+    line-height: 50px;
+    font-size: 20px;
+}
+.list ul li:hover{
+    color: rgb(255,157,0)!important;
+}
+.check{
+    color: rgb(255,157,0)!important;
+}
+.list ul li a{
+    display: inline-block;
+    width: 100%;
+    height: 100%;
+}
+.list ul li a:hover{
+    color: rgb(255,157,0)!important;
+}
+.middle{
+    margin-top: 10px;
+    text-align: center;
+    background: #ccc;
+}
+.bottom{
+    position: fixed;
+    left: 0;
+    top: 970px;
+    width: 100%;
+    height: 820px;
+    border: 1px solid #ccc;
+    background: #ccc;
+}
+.article{
+    float: left;
+    margin-left:200px;
+    width: 60%;
+    border: 1px solid #ccc;
+}
+.article .demo{
+    margin-top: 10px;
+    background: white;
+}
+.aside{
+    
+    float: left;
+    margin-left: 10px;
+    width: 300px;
+    
+}
+.denglu{
+    margin-top: 10px;
+    border:1px solid yellow;
+    background: white;
+    padding: 10px;
+}
+.footer{
+    margin-top: 10px;
+    background: white;
+    height: 70px;
+}
+.focus{
+    
+    background: rgb(233, 185, 30);
+}
+.danger{
+    width: 100%;
+    height: 30px;
+    line-height: 30px;
+    text-align: center;
+    background: rgb(245, 75, 8);
+}
+/* 轮播图 */
+.round{
+    position: relative;
+}
+.slide {
+    width: 100%;
+    height: 1014px;
+    overflow: hidden;
+  }
+  .slide .slideshow{
+    position: relative;
+    width: 100%;
+    height: 1014px;
+    margin-top:-10px;
+  }
+  .slide .slideshow li {
+    position: absolute;
+    width: 100%;
+    height: 1014px;
+  }
+  .slide .slideshow li  img {
+    display: inline-block;
+    width: 100%;
+    height: 1014px;
+  }
+  .slide .bullet {
+      position: absolute;
+      top: 70%;
+  }
+  .slide .bullet img{
+
+      display: inline-block;
+      width: 150px;
+      height: 100px;
+      margin-left: 30px;
+  }
+  .active {
+    box-shadow: 0 0 10px  rgb(255,157,0);
+  }
+  .selected{
+      color:rgb(255,157,0)!important;
+  }
+  .image-enter-active {
+    transform: translateX(0);
+    transition: all 1.5s ease;
+  }
+  .image-leave-active {
+    transform: translateX(-100%);
+    transition: all 1.5s ease;
+  }
+  .image-enter {
+    transform: translateX(100%);
+  }
+  .image-leave {
+    transform: translateX(0);
+  }
+  /*  */

@@ -1,0 +1,17 @@
+<nav>
+<ul class="pager">
+    {%if page <= 1 %}
+    <li class="previous"><span aria-hidden="true">&larr;</span> 没有上一页</li>
+    {%else%}
+    <li class="previous"><a href="/?category={{category}}&page={{page-1}}"><span aria-hidden="true">&larr;</span> 上一页</a></li>
+    {%endif%}
+    
+    <li>一共{{counts}}条数据 一页{{limit}}条数据 一共{{pages}}页 当前{{page}}页</li>
+    {%if page >= pages %}
+    <li class="next">没有下一页 <span aria-hidden="true">&rarr;</span></li>
+    {%else%}
+    <li class="next"><a href="/?category={{category}}&page={{page+1}}">下一页 <span aria-hidden="true">&rarr;</span></a></li>
+    {%endif%}
+    
+</ul>
+</nav>

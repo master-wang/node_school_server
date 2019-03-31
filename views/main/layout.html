@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" type="text/css" href="/public/css/main.css">
+    <link rel="stylesheet" href="/public/css/bootstrap.css">
+    <script src="/public/js/jquery.js"></script>
+    <script src="/public/js/bootstrap.js"></script>
+    <script src="/public/js/vue.js"></script>
+    <script src="/public/js/vue-router.js"></script>
+    <script src="/public/js/index.js"></script>
+    <title>西邮校园</title>
+</head>
+<body>
+    <div id="app">
+        <div class="top">
+            <h1>西邮之家</h1>
+            <div class="round">
+                <div class="slide" v-on:mouseover="stop()" v-on:mouseout="move()">
+                    <div class="slideshow">
+                    <transition-group tag="ul" name="image">
+                        <li v-for="(img, index) in roundImgs" v-show="index===mark || index===(mark%4+1)" :key="index">
+                        <a href="#">
+                            <img :src='img'>
+                        </a>
+                        </li>
+                    </transition-group>
+                    </div>
+        
+                    <div class="bullet">
+                    <img v-for="(item, index) in roundImgs" :class="{ 'active':index===mark+1 }"
+                    @click="change(index-1)" :key="index" :src="item"></img>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bottom">
+            <div class="list">
+                <img @click="up_or_down()" class="up_down_img" src="/public/imgs/up.png" alt="">
+                <div class="list_mid">
+                <ul>
+                    <li  @click="color_stasus='index'" ><router-link to='/' :class="{check:color_stasus==='index'}">首页</router-link></li>
+                    <li  @click="color_stasus='scgoolBoard'"><router-link to='/scgoolBoard/boardShow'  :class="{check:color_stasus==='scgoolBoard'}">校园公告栏</router-link></li>
+                    <li  @click="color_stasus='schoolFriends'"><router-link to='/schoolFriends'  :class="{check:color_stasus==='schoolFriends'}">校友</router-link></li>
+                </ul>
+                </div>
+            </div>
+        
+            <div class="middle">
+                <!-- 中间信息主题部分 -->
+                <div class="article">
+                    <router-view></router-view> 
+                    <!-- 引用分页模板 -->
+                    <!-- <div v-if="color_stasus!='index'&&color_stasus!='updateUserInfo'" class="footer">
+                       
+                        {% include 'page.html'%}
+                    </div> -->
+                </div>
+                <!-- 右侧的登录注册完善信息 -->
+                <div class="aside">
+                    <div class="denglu" id="UserIofo" v-if="login_stadus==='ok'">
+                            <h2>我的信息</h2>
+                            <hr>
+                            <img :src="userInfo.head_img" alt="" style="width:60px;height:60px;border-radius:50%">
+                            <a v-if="userInfo.isAdmin" class="info">你好，管理员:${ userInfo.username }！</a>
+
+                            <a v-if="!userInfo.isAdmin" class="info">${ userInfo.username },你好！，欢迎光临西邮之家！</a>
+                            
+                            </p>
+                            <span  @click="color_stasus='updateUserInfo'"><router-link to='/updateUserInfo'  :class="{check:color_stasus==='updateUserInfo'}">完善个人信息</router-link></span>
+                            
+                            <p><a href="javascript:;" id="logout" @click="login_out()">退出登录</a></p>
+                    </div>
+                    
+                    <div class="denglu" id="loginBox" v-if="login_stadus==='login'">
+                            <h2>登陆</h2>
+                            <hr>
+                            <label for="">
+                                用户名：<input v-model="login_userInfo.username" type="text" name="d_username">
+                            </label>
+                            <br>
+                            <label for="">
+                                    密码：<input v-model="login_userInfo.password" type="password" name="d_password">
+                                </label>
+                                <br>
+                            <button @click="User_login()">登陆</button>
+                            <p>还没注册？<a href="javascript:;" class="cloMint" @click="login_stadus='register'">马上注册</a></p>
+                            <p class="info">${login_tip}</p>
+                    </div>
+                    <div class="denglu" id="registerBox" v-if="login_stadus==='register'">
+                            <h2>注册</h2>
+                            <hr>
+                            <label for="">
+                                用户名：<input v-model="register_userInfo.username" type="text" name="z_username">
+                            </label>
+                            <br>
+                            <label for="">
+                                    密码：<input v-model="register_userInfo.password" type="password" name="z_password">
+                                </label>
+                            <br>
+                            <label for="">
+                                    确认：<input v-model="register_userInfo.repassword" type="password" name="z_repassword">
+                                </label>
+                                <br>
+                            <button @click="User_resister()">注册</button>
+                            <p class="tip">${register_tip}</p>
+                            <p>已有账号<a href="javascript:;"  class="cloMint" @click="login_stadus='login'">马上登陆</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</body>
+</html>
