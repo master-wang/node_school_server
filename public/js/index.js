@@ -99,13 +99,173 @@ $(function(){
             
         `
     }
-    var schoolFriends={
+    var classMate = {
         template : `
             <div>
-                <h1>schoolFriends</h1>
+                <h1>寻找我的校友</h1>
+                <label for="">
+                    昵称：<input  v-model="seach_info.nicheng"   type="text" class="form-control" placeholder="昵称：">
+                </label>
+                <label for="">
+                    性别：<select name=""  v-model="seach_info.sex"  class="form-control">
+                            <option value="男">男</option>
+                            <option value="女">女</option>
+                        </select>
+                </label>
+                <label for="">
+                    院系<select name=""  v-model="seach_info.faculty"  class="form-control">
+                            <option value="计院">计院</option>
+                            <option value="通院">通院</option>
+                            <option value="电院">电院</option>
+                            <option value="理学院">理学院</option>
+                            <option value="数媒">数媒</option>
+                        </select>
+                </label> 
+                <label for="">
+                    班级：<input  v-model="seach_info.Class"  type="text" class="form-control" placeholder="输入班级">
+                </label>
+                <label for="">
+                    是否单身：<select name=""  v-model="seach_info.danshen"  class="form-control">
+                            <option value="单身">单身</option>
+                            <option value="已脱单">已脱单</option>
+                        </select>
+                </label>
+                <table class="table table-striped table-hover">
+                    <thead>
+                    <tr>
+                        <th  style="text-align:center;">用户名</th>
+                        <th style="text-align:center;">昵称</th>
+                        <th style="text-align:center;">院系</th>
+                        <th style="text-align:center;">班级</th>
+                        <th style="text-align:center;">性别</th>
+                        <th style="text-align:center;">是否单身</th>
+                    </tr>
+                    </thead>
+                    <tfoot>
+                    <tr v-for="user in searched_data">
+                        <td>{{user.username}}</td>
+                        <td>{{user.nicheng}}</td>
+                        <td>{{user.faculty}}</td>
+                        <td>{{user.Class}}</td>
+                        <td>{{user.sex}}</td>
+                        <td>{{user.danshen}}</td>
+                    </tr>
+                    </tfoot>
+                </table>
+            </div>
+            
+        `,
+        data:function(){
+            return {
+                seach_info:{
+                    nicheng:'',
+                    sex:'',
+                    faculty:'',
+                    Class:'',
+                    danshen:''
+                },
+                userInfo:{},
+                usersList:[
+                    {
+                        username:'王少',
+                        nicheng:'wang',
+                        sex:'男',
+                        faculty:'计算机学院',
+                        Class:'1703',
+                        danshen:'单身'
+                    }
+                ],
+            }
+        },
+        methods:{
+            seachUsers(){
+
+            },
+            getAllUserList(){
+                var that = this;
+                $.ajax({
+                    type:'get',
+                    url:'/api/user/getAllList',
+                    success:function(result){
+                        that.usersList=result.usersList;
+                    }
+                });
+            }
+        },
+        computed:{
+            searched_data: function () {
+                let arrList = [];//存放数据
+                let me = this;
+                let list = this.usersList;
+                for (let i = 0;i < list.length;i++){
+                    if (list[i].nicheng.search(me.seach_info.nicheng) != -1&&
+                        list[i].sex.search(me.seach_info.sex) != -1&&
+                        list[i].faculty.search(me.seach_info.faculty) != -1&&
+                        list[i].Class.search(me.seach_info.Class) != -1&&
+                        list[i].danshen.search(me.seach_info.danshen) != -1
+                    ) {
+                        arrList.push(list[i]);
+                    }
+                }
+                return arrList;
+            }
+        },
+        created() {
+            this.userInfo=JSON.parse(localStorage.getItem('userInfo'));
+            this.getAllUserList();
+        }
+    }
+    var friends = {
+        template : `
+            <div>
+            <div class="box">
+
+            <div class="box1">
+                <div class="box1-nav1"><img src="/public/imgs/pict1.jpg"><span>张三</span></div>
+                <div class="box1-nav2"><img src="/public/imgs/pict2.jpg"><span>李四</span></div>
+                <div class="box1-nav3"><img src="/public/imgs/pict3.jpg"><span>王二麻子</span></div>
+            </div>
+            <div class="box2">
+                <div class="box2-nav">张三</div>
+                <div class="box2-nav1">
+                    <ul class="message">
+                        <li class="left1"><img src="/public/imgs/pict1.jpg"></li> <li class="left2">111uuuuuuu1</li>
+                        <li class="right1">222</li> <li class="right2"><img src="/public/imgs/pict2.jpg"></li>
+                    </ul>
+                </div>
+                <div class="box2-nav2">
+                    <textarea></textarea>
+                    <button class="submit btn btn-primary" type="button" name="submit">发送</button>
+                </div>
+            </div>
+    
+        </div>
             </div>
             
         `
+    }
+    var schoolFriends={
+        template : `
+            <div>
+            <div class="list">
+                <div class="list_mid">
+                    <ul>
+                        <li  @click="color_stasus='校友'" ><router-link to='/schoolFriends/classMate' :class="{check:color_stasus==='校友'}">校友</router-link></li>
+                        <li  @click="color_stasus='我的好友'" ><router-link to='/scgoolBoard/friends' :class="{check:color_stasus==='我的好友'}">我的好友</router-link></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="article_main">
+            <router-view></router-view>
+            </div>
+            </div>
+            
+        `,
+        data:function(){
+            return {
+                color_stasus:'校友'
+            }
+        },
     }
     var boardShow={
         template : `
@@ -123,22 +283,45 @@ $(function(){
                     </label>
                 </h3>
                 <div v-for="board in boardsList" style="margin-top:20px;border:2px solid red">
-                    <h3><img :src="board.b_release.head_img" style="width:100px;height:100px;">/{{board.b_release.nicheng}}/{{board.b_release.faculty}}
-                    /{{board.b_release.Class}}/{{board.b_cTime}}
-                    </h3>
-                    <h3>{{board.b_theme}}</h3>
-                    <h3>{{board.b_disc}}</h3>
-                    <h3><img v-for="img in board.b_img" :src="img" ></h3>
-                    <button v-if="board.b_release._id==userInfo._id" type="button" class="btn btn-danger" @click="BoardsDelete(board._id)">删除</button>
-                    <div style="border:1px solid blue">
-                        <button class="btn btn-primary" @click="oneBoardGet(board._id)">详情（浏览量：{{board.views}}）(评论3+)</button>
-                        <p v-for="c in selectThree(board.comments)">昵称:<span>{{c.username}}</span>评论：<span>{{c.content}}</span>时间：<span>{{c.postTime}}</span>
-                          <button v-if="board.b_release._id==userInfo._id" type="button" class="btn btn-danger" @click="conmentDelete(c,board._id)">删除</button>
-                        </p>
-                        <textarea v-model="addcomInfo" name="" id="" cols="30" rows="10"></textarea>
-                        <button class="btn btn-primary" @click="addComment(board._id)">发表</button>
+                    <div class="notice">
+                        <div class="content">
+                            <div class="client">
+                                <img :src="board.b_release.head_img">
+                                <p>{{board.b_release.nicheng}}&nbsp;&nbsp;&nbsp;&nbsp;{{board.b_release.faculty}}&nbsp;&nbsp;&nbsp;&nbsp;{{board.b_release.Class}}<br/>{{board.b_cTime}} <span style="floatLright:margin-right:-130px">浏览量 {{board.views}}
+                                    <button v-if="board.b_release._id==userInfo._id" type="button" class="btn btn-danger" @click="BoardsDelete(board._id)">删除</button>
+                                    <button class="btn btn-primary" @click="oneBoardGet(board._id)">详情</button>
+                                </span></p>
+                                
+                            </div>
+                                <h2>{{board.b_theme}}</h2>
+                                <p style="text-indent:2em;align:left;position:relative">{{board.b_disc}}</p>
+                                <div class="content_img">
+                                    <ul>
+                                        <li v-for="img in board.b_img"><img :src="img" ></li>
+                                    </ul>
+                                </div>
+                        </div>
+                    </div>
+                    <div class="discuss">
+                        <h5>用户评论   (已有{{board.comments.length}}评论)</h5><br>
+                        <img :src="userInfo.head_img" alt="">
+                        <textarea v-model="addcomInfo" cols="50" rows="2"></textarea>
+                        <span>
+                            <button class="btn btn-primary" @click="addComment(board._id)">发表</button>
+                        </span>
+                    </div>
+                    <div class="new_discuss">
+                        <h5>最新评论</h5>
+                        <div v-for="c in selectThree(board.comments)">
+                            
+                            <p><a href="#">{{c.username}}:</a>{{c.content}}
+                                <span  >{{c.postTime}}</span>
+                                <button v-if="board.b_release._id==userInfo._id" type="button" class="btn btn-danger" @click="conmentDelete(c,board._id)">删除</button>
+                            </p>
+                        </div>
                     </div>
                 </div>
+                
             </div>
         `,
         data:function(){
@@ -613,6 +796,13 @@ $(function(){
                     </label> 
                     <br />
                     <label for="">
+                        性别：<select name=""   v-model="update_userInfo.danshen"  class="form-control">
+                                <option value="单身">单身</option>
+                                <option value="已脱单">已脱单</option>
+                            </select>
+                    </label> 
+                    <br />
+                    <label for="">
                         描述：<input v-model="update_userInfo.disc" type="text" class="form-control" placeholder="描述">
                     </label>
                     <br />
@@ -651,7 +841,8 @@ $(function(){
                     "disc":'',
                     "faculty":'计院',
                     "Class":'',
-                    "_id":''
+                    "_id":'',
+                    "danshen":'单身'
                 }
             }
         },
@@ -762,7 +953,19 @@ $(function(){
         },
         {
             path : '/schoolFriends',
-            component : schoolFriends
+            component : schoolFriends,
+            children:[
+                {
+                    path : '/schoolFriends/classMate',
+                    component : classMate
+        
+                },
+                {
+                    path : '/scgoolBoard/friends',
+                    component : friends
+        
+                },
+            ]
 
         },
         {

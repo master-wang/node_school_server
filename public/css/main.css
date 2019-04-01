@@ -81,12 +81,12 @@ body{
 .article{
     float: left;
     margin-left:200px;
-    width: 800px;
+    width: 1000px;
     height: 650px;
     border: 1px solid #ccc;
 }
 .article_main{
-    width: 800px;
+    width: 100%;
     height: 650px;
     overflow-x: hidden;
     overflow-y: scroll;
@@ -180,4 +180,251 @@ body{
   .image-leave {
     transform: translateX(0);
   }
-  /*  */
+  /* 
+    好友的
+  */
+  ul {
+    list-style: none;
+}
+
+input:hover,
+input:focus,
+textarea:hover,
+textarea:focus {
+    outline: none;
+}
+
+.box {
+    position: relative;
+    width: 100%;
+    height: 600px;
+    border: 1px solid rgb(189, 188, 188);
+}
+
+.box1 {
+    position: absolute;
+    left: 0;
+    width: 30%;
+    height: 100%;
+    background-color: rgb(231, 227, 227);
+}
+
+.box1>div {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 60px;
+    border-bottom:1px solid #ccc;
+    line-height: 60px;
+}
+.box1>div:hover{
+    background-color: rgba(136, 132, 132, 0.3);
+}
+.box1>.box1-nav1{
+    top: 0px;
+}
+.box1>.box1-nav2{
+    top: 65px;
+}
+.box1>.box1-nav3{
+    top: 130px;
+}
+
+.box1>div>img {
+    margin: 10px;
+    margin-left: 30px;
+    width: 45px;
+    height: 45px;
+    border-radius:50%;
+}
+
+.box1>div>span {
+    position: absolute;
+    left: 5px;
+    top: 20px;
+    display: inline-block;
+    height: 100%;
+}
+
+.box2 {
+    position: absolute;
+    right: 0;
+    width: 70%;
+    height: 100%;
+}
+.box2-nav{
+    height: 7%;
+    background-color: rgb(245, 243, 243);
+    border-bottom: 1px solid rgb(189, 188, 188);
+    box-sizing: border-box;
+    font-size: 18px;
+    line-height: 30px;
+    text-align: center;
+}
+.box2-nav1 {
+    position: absolute;
+    width: 100%;
+    height: 68%;
+}
+
+.box2-nav1>.message {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgb(245, 243, 243);
+}
+.box2-nav1>.message img{
+    width: 40px;
+    height: 40px;
+    margin: 10px;
+    border-radius:50%;
+}
+
+.box2-nav1>.message>.left2, .box2-nav1>.message>.right1 {
+    word-wrap:break-word;  
+    word-break:break-all;  
+    padding: 5px;
+    white-space: wrap;
+}
+.box2-nav1>.message>.left1 {
+   position: absolute;
+   top: 10px;
+   left: 0;
+}
+
+.box2-nav1>.message>.left2 {
+   position: absolute;
+   top: 25px;
+   left: 65px;
+   background-color: rgb(219, 210, 210);
+}
+
+.box2-nav1>.message>.right1 {
+   position: absolute;
+   top: 55px;
+  right: 65px;
+  background-color: rgb(132, 187, 132);
+}
+.box2-nav1>.message>.right2 {
+   position: absolute;
+   top: 40px;
+   right: 0;
+ 
+}
+
+.box2-nav2 {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 25%;
+}
+
+.box2-nav2>textarea {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 65%;
+    box-sizing: border-box;
+    border: none;
+}
+
+.box2-nav2>.submit {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 20%;
+    height: 20%;
+    margin: 7px;
+    background-color: rgb(223, 213, 223, 0.7);
+}
+/* 
+*公告
+*/
+.notice .content{
+    height: 400px;
+    left: 30px;
+    top: 30px;
+    border:1px #ccc solid;
+    position: relative;
+}.content ul li{
+    list-style-type: none;
+    display: inline-block;
+}.content_img img{
+    width: 150px;
+    height: 150px;
+    margin-left: 20px;
+    margin: 20px 10px;
+}.client img{
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+}.content .client{
+    position: absolute;
+    left: 10px;
+    top: 10px;
+}
+.content h2{
+    margin-top: 90px;
+}
+.content h4{
+    position: absolute;
+    top: 70px;
+    left: 20px;
+    font-family: Times New Roman;
+}.content .client p{
+    position: absolute;
+    top: 1px;
+    left: 60px;
+    height: 50px;
+    width: 304px;
+    /*border:1px red solid;*/
+    font-family: Comic Sans MS;
+}.client p span{
+    position: absolute;
+    top: 20px;
+    right: -500px;
+    font-size:14px;
+    /*font-family:*/ 
+    /*border:1px red solid;*/
+}
+/*用户评论区*/
+ .discuss{
+    height: 70px;
+    top: 360px;
+    /*border:1px red solid;*/
+}.discuss img{
+    width: 40px;
+    height: 40px;
+    margin-right:10px;
+    border-radius:50%;
+    top:18px;
+}.discuss input{
+    right: 40px;
+    width: 60px;
+}.new_discuss{
+    margin-top: 35px;
+    margin-bottom: 20px;
+    width: 100%;
+    border-top: 1px #ddd solid;
+    /*border:1px red solid;*/
+}
+img {
+    vertical-align:auto;
+}
+.new_discuss img{
+    width: 100%;
+    top: 20px;
+    border-radius: 50%;
+}.new_discuss p{
+    left: 60px;
+}.new_discuss p a{
+    text-decoration:none;
+}
+.new_discuss span{
+}
+.jumbotron{
+    position: relative;
+}

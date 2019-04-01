@@ -23,6 +23,10 @@ module.exports = new mongoose.Schema({
         type:String,
         default:''
     },
+    danshen:{//班级
+        type:String,
+        default:''
+    },
     addTime:{//添加的时间
         type:Date,
         default:new Date()

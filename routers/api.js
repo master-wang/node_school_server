@@ -128,6 +128,7 @@ router.post('/user/UpateInfo',function(req,res){
     var faculty = req.body.faculty;
     var Class = req.body.Class;
     var _id = req.body._id;
+    var danshen = req.body.danshen
     console.log(nicheng+"--"+sex+"--"+disc+"--"+faculty+"--"+Class+"--"+_id)
     if(req.body.username == ''){
         responData.code = 1;
@@ -150,7 +151,8 @@ router.post('/user/UpateInfo',function(req,res){
         disc : req.body.disc,
         faculty : req.body.faculty,
         Class : req.body.Class,
-        _id : req.body._id
+        _id : req.body._id,
+        danshen
     }).then(function(info){
         responData.message = '文字上传成功';
         responData.userInfo = info
@@ -184,7 +186,15 @@ router.post('/user/UpateInfoImg',upload.single('photo'),function(req,res){
         return;
     })
 })
-
+//获取所有的用户的信息
+router.get('/user/getAllList',function(req,res){
+    User.find().sort({_id:-1}).then(function(usersList){
+        console.log(usersList,"11111111111111111111");
+        responData.message = '请求公告数据成功！';
+        responData.usersList = usersList;
+        res.json(responData);
+    })
+})
 router.get('/user/logout',function(req,res){
     req.cookies.set('userInfo',null);
     responData.message = '退出成功！';
