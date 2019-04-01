@@ -290,6 +290,23 @@ router.post('/boards/getItemBoardsInfo',function(req,res){
         res.json(responData);
     })
 })
+//获取单个 公告的信息 和添加浏览量
+router.get('/boards/getOneBoardinfo',function(req,res){
+    var id=req.query.id || '';
+    console.log(id);
+    Boards.findOne({
+        _id:id
+    }).populate('b_release').then(function(info){
+        info.views++;
+        return info.save();
+    }).then(function(newInfo){
+        console.log(newInfo);
+        responData.message = '获取单个公告信息成功！';
+        responData.newInfo = newInfo;
+        res.json(responData);
+    })
+    
+})
 //删除自己发的item
 router.get('/boards/delete',function(req,res){
     var id=req.query.id || '';
@@ -327,34 +344,44 @@ router.post('/boards/comment/post',function(req,res){
 router.post('/boards/comment/delete',function(req,res){
     var c = req.body.c || '';
     var b_Id = req.body.b_Id || '';
-    console.log(c+"--"+b_Id);
-    console.log(c);
+    c.postTime =new Date(c.postTime)
     Boards.findOne({
         _id:b_Id
     }).then(function(content){
-        var length = content.comments;
+        var length = content.comments.length;
+        console.log(length,"555555555555555555555555");
+        console.log(c)
+        console.log("11111111111111111111")
+        console.log(content.comments[0])
+        console.log(c == content.comments[0],"ok???")
+        console.log( content.comments[0].postTime.toString() == c.postTime.toString())
         for (var i = 0; i < length; i++) {
-            if (content.comments[i] == c) {
-                console.log(content.comments[i])
+            if (
+                content.comments[i].postTime.toString() == c.postTime.toString()
+                ) {
                 if (i == 0) {
+                    console.log("0000000000")
                     content.comments.shift(); //删除并返回数组的第一个元素
                     return content.save();
                 }
                 else if (i == length - 1) {
+                    console.log("11111")
                     content.comments.pop();  //删除并返回数组的最后一个元素
                     return content.save();
                 }
                 else {
+                    console.log("endendende")
                     content.comments.splice(i, 1); //删除下标为i的元素
                     return content.save();
                 }
             }
         }
     }).then(function(newContent){
+        console.log("-----------------")
         console.log(newContent);
-        // responData.message = '评论成功！';
-        // responData.newContent = newContent;
-        // res.json(responData);
+        responData.message = '删除评论成功！';
+        responData.newContent = newContent;
+        res.json(responData);
     })
 
 })

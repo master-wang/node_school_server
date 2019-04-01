@@ -123,19 +123,20 @@ $(function(){
                     </label>
                 </h3>
                 <div v-for="board in boardsList" style="margin-top:20px;border:2px solid red">
-                    <h3><img :src="board.b_release.head_img">/{{board.b_release.nicheng}}/{{board.b_release.faculty}}
-                    /{{board.b_release.Class}}/{{board.b_cTime}}/{{board.views}}
+                    <h3><img :src="board.b_release.head_img" style="width:100px;height:100px;">/{{board.b_release.nicheng}}/{{board.b_release.faculty}}
+                    /{{board.b_release.Class}}/{{board.b_cTime}}
                     </h3>
                     <h3>{{board.b_theme}}</h3>
                     <h3>{{board.b_disc}}</h3>
-                    <h3><img v-for="img in board.b_img" :src="img"></h3>
+                    <h3><img v-for="img in board.b_img" :src="img" ></h3>
                     <button v-if="board.b_release._id==userInfo._id" type="button" class="btn btn-danger" @click="BoardsDelete(board._id)">删除</button>
                     <div style="border:1px solid blue">
-                        <p v-for="c in board.comments">昵称:<span>{{c.username}}</span>评论：<span>{{c.content}}</span>时间：<span>{{c.postTime}}</span>
+                        <button class="btn btn-primary" @click="oneBoardGet(board._id)">详情（浏览量：{{board.views}}）(评论3+)</button>
+                        <p v-for="c in selectThree(board.comments)">昵称:<span>{{c.username}}</span>评论：<span>{{c.content}}</span>时间：<span>{{c.postTime}}</span>
                           <button v-if="board.b_release._id==userInfo._id" type="button" class="btn btn-danger" @click="conmentDelete(c,board._id)">删除</button>
                         </p>
                         <textarea v-model="addcomInfo" name="" id="" cols="30" rows="10"></textarea>
-                        <button class="btn btn-primart" @click="addComment(board._id)">发表</button>
+                        <button class="btn btn-primary" @click="addComment(board._id)">发表</button>
                     </div>
                 </div>
             </div>
@@ -145,7 +146,7 @@ $(function(){
                 boardsList:[],
                 userInfo:{},
                 item:'',
-                addcomInfo:''
+                addcomInfo:'',
             }
         },
         methods:{
@@ -165,6 +166,17 @@ $(function(){
                     }
                 });
             },
+            selectThree(comments){
+                var arr=[]
+                if(comments.length<=3){
+                    return comments
+                }else{
+                    arr.push(comments[0]);
+                    arr.push(comments[1]);
+                    arr.push(comments[2]);
+                    return arr
+                }
+            },
             getAllBoardsList(){
                 var that = this;
                 $.ajax({
@@ -173,6 +185,26 @@ $(function(){
                     success:function(result){
                         that.boardsList = result.BoardsList;
                         
+                    }
+                });
+            },
+            oneBoardGet(b_id){
+                var that = this;
+                $.ajax({
+                    type:'get',
+                    url:'/api/boards/getOneBoardinfo?id='+b_id,
+                    success:function(result){
+                        that.boardsList.forEach((element,index)=> {
+                            if(element._id==b_id){
+                                that.boardsList[index].views=result.newInfo.views
+                            }
+                        });
+                        that.$router.push({
+                            path: '/scgoolBoard/boardView',
+                            query: {
+                                b_id
+                            }
+                        })
                     }
                 });
             },
@@ -210,7 +242,7 @@ $(function(){
                             that.addcomInfo='';
                             that.boardsList.forEach((element,index)=> {
                                 if(element._id==b_Id){
-                                    that.boardsList[index]=result.newContent
+                                    that.boardsList[index].comments=result.newContent.comments
                                     console.log(index);
                                     console.log(that.boardsList[index]);
                                 }
@@ -231,12 +263,11 @@ $(function(){
                     dataType:'json',
                     success:function(result){
                         console.log(result);
-                        that.addcomInfo='';
                         that.boardsList.forEach((element,index)=> {
                             if(element._id==b_Id){
-                                that.boardsList[index]=result.newContent
+                                that.boardsList[index].comments=result.newContent.comments
                                 console.log(index);
-                                console.log(that.boardsList[index]);
+                                console.log(that.boardsList[index].comments);
                             }
                         });
                     }
@@ -374,37 +405,41 @@ $(function(){
                         if(!x){
                             alert("照片未选择！")
                        }else{
-                            var formData = new FormData();
-                            for(var index = 0; index < $('#updateBoard_imgs')[0].files.length; index++){
-                                formData.append('file', $('#updateBoard_imgs')[0].files[index]);
-                            }
-                            this.userInfo=JSON.parse(localStorage.getItem('userInfo'));
-                            this.boardInfo._id=this.userInfo._id.toString();
-            
-                            formData.append('item', that.boardInfo.item);
-                            formData.append('b_theme', that.boardInfo.b_theme);
-                            formData.append('b_disc', that.boardInfo.b_disc);
-                            formData.append('_id', that.boardInfo.item);
-                            console.log(formData);
-                            $.ajax({
-                                type:'post',
-                                url:'/api/boards/addInfoImg',
-                                data:formData,
-                                dataType: 'JSON',  
-                                cache: false,  
-                                processData: false,  //不处理发送的数据，因为data值是FormData对象，不需要对数据做处理 
-                                contentType: false,
-                                success:function(result){
-                                    console.log(result);
-                                    // that.post_boardInfo();
-                                    that.$router.push({
-                                        path: '/scgoolBoard/successInfo',
-                                        query: {
-                                        "msg":"公告上传成功！"
-                                        }
-                                    })
+                            if($('#updateBoard_imgs')[0].files.length>3){
+                                alert("图片最多可以上传三张！");
+                            }else{
+                                var formData = new FormData();
+                                for(var index = 0; index < $('#updateBoard_imgs')[0].files.length; index++){
+                                    formData.append('file', $('#updateBoard_imgs')[0].files[index]);
                                 }
-                            });
+                                this.userInfo=JSON.parse(localStorage.getItem('userInfo'));
+                                this.boardInfo._id=this.userInfo._id.toString();
+                
+                                formData.append('item', that.boardInfo.item);
+                                formData.append('b_theme', that.boardInfo.b_theme);
+                                formData.append('b_disc', that.boardInfo.b_disc);
+                                formData.append('_id', that.boardInfo.item);
+                                console.log(formData);
+                                $.ajax({
+                                    type:'post',
+                                    url:'/api/boards/addInfoImg',
+                                    data:formData,
+                                    dataType: 'JSON',  
+                                    cache: false,  
+                                    processData: false,  //不处理发送的数据，因为data值是FormData对象，不需要对数据做处理 
+                                    contentType: false,
+                                    success:function(result){
+                                        console.log(result);
+                                        // that.post_boardInfo();
+                                        that.$router.push({
+                                            path: '/scgoolBoard/successInfo',
+                                            query: {
+                                            "msg":"公告上传成功！"
+                                            }
+                                        })
+                                    }
+                                });
+                            }
                        }
                     }
                 }
@@ -415,6 +450,110 @@ $(function(){
         created() {
             this.userInfo=JSON.parse(localStorage.getItem('userInfo'));    
         },
+    }
+    var boardView={
+        template : `
+        <div  class="jumbotron">
+        <div style="margin-top:20px;border:2px solid red">
+            <h3><img :src="board.b_release.head_img" style="width:100px;height:100px;">/{{board.b_release.nicheng}}/{{board.b_release.faculty}}
+            /{{board.b_release.Class}}/{{board.b_cTime}}/<button class="btn btn-primary">浏览量：{{board.views}}）</button>
+            </h3>
+            <h3>{{board.b_theme}}</h3>
+            <h3>{{board.b_disc}}</h3>
+            <h3><img v-for="img in board.b_img" :src="img" ></h3>
+            <button v-if="board.b_release._id==userInfo._id" type="button" class="btn btn-danger" @click="BoardsDelete(board._id)">删除</button>
+            <div style="border:1px solid blue">
+                <textarea v-model="addcomInfo" name="" id="" cols="30" rows="10"></textarea>
+                <button class="btn btn-primary" @click="addComment(board._id)">发表</button>
+                <p v-for="c in board.comments">昵称:<span>{{c.username}}</span>评论：<span>{{c.content}}</span>时间：<span>{{c.postTime}}</span>
+                  <button v-if="board.b_release._id==userInfo._id" type="button" class="btn btn-danger" @click="conmentDelete(c,board._id)">删除</button>
+                </p>
+            </div>
+        </div>
+    </div>
+            
+        `,
+        data:function(){
+            return {
+                board:{},
+                b_id:this.$route.query.b_id,
+                userInfo:{},
+                addcomInfo:''
+
+            }
+        },
+        methods:{
+            oneBoardGet(b_id){
+                var that = this;
+                $.ajax({
+                    type:'get',
+                    url:'/api/boards/getOneBoardinfo?id='+b_id,
+                    success:function(result){
+                        that.board=result.newInfo;
+                        console.log(that.board);
+                    }
+                });
+            },
+            BoardsDelete(board_id){
+                var that = this;
+                $.ajax({
+                    type:'get',
+                    url:'/api/boards/delete?id='+board_id,
+                    success:function(result){
+                        that.$router.push({
+                            path: '/scgoolBoard/successInfo',
+                            query: {
+                            "msg":"删除成功！"
+                            }
+                        })
+                        
+                    }
+                });
+            },
+            addComment(b_Id){
+                var that = this;
+                if(this.addcomInfo==''){
+                    alert("评论不能为空！");
+                }else{
+                    $.ajax({
+                        type:'post',
+                        url:'/api/boards/comment/post',
+                        data:{
+                            b_Id,
+                            messageContent:that.addcomInfo
+                        },
+                        dataType:'json',
+                        success:function(result){
+                            console.log(result);
+                            that.addcomInfo='';
+                            
+                            that.board.comments=result.newContent.comments
+                            
+                        }
+                    });
+                }
+            },
+            conmentDelete(c,b_Id){
+                var that = this;
+                $.ajax({
+                    type:'post',
+                    url:'/api/boards/comment/delete',
+                    data:{
+                        c,
+                        b_Id
+                    },
+                    dataType:'json',
+                    success:function(result){
+                        that.board.comments=result.newContent.comments
+                    }
+                });
+            },
+        },
+        created() {
+            this.userInfo=JSON.parse(localStorage.getItem('userInfo'));
+            console.log(this.$route.query.b_id);
+            this.oneBoardGet(this.$route.query.b_id);
+        }
     }
     var scgoolBoard={
         template : `
@@ -613,6 +752,11 @@ $(function(){
                     component : successInfo
         
                 },
+                {
+                    path : '/scgoolBoard/boardView',
+                    component : boardView
+        
+                },
             ]
 
         },
@@ -775,7 +919,7 @@ $(function(){
                     success:function(result){
                         console.log(result);
                         that.loginOut_tip=result.message;
-                        that.userInfo={};
+                        that.userInfo=null;
                         localStorage.setItem('userInfo',null);
                         if(!result.code){
                             alert("退出登录成功！");

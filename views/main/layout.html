@@ -53,12 +53,14 @@
             <div class="middle">
                 <!-- 中间信息主题部分 -->
                 <div class="article">
+                    <button v-if="!userInfo" class="btn btn-danger">您还没有登录，请先登录</button>
                     <router-view></router-view> 
                     <!-- 引用分页模板 -->
                     <!-- <div v-if="color_stasus!='index'&&color_stasus!='updateUserInfo'" class="footer">
                        
                         {% include 'page.html'%}
                     </div> -->
+                   
                 </div>
                 <!-- 右侧的登录注册完善信息 -->
                 <div class="aside">
