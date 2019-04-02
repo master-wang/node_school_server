@@ -2,7 +2,7 @@ var express=require('express');
 var router=express.Router();
 var User=require('../models/user');
 var Boards = require('../models/board');
-var Content=require('../models/content');
+var Hails = require('../models/hail');
 var responData;
 //上传图片的 multer 配置
 const multer = require('multer');
@@ -395,4 +395,35 @@ router.post('/boards/comment/delete',function(req,res){
     })
 
 })
+//加好友请求
+router.get('/user/FriendRequest',function(req,res){
+    var to_user = req.query.to_id;
+    var from_user = req.userInfo._id;
+    console.log(to_user+"---"+from_user);
+
+    new Hails({
+        from_user,
+        to_user
+    }).save().then(function(Hailsinfo){
+        return Hails.find({from_user}).populate(['from_user','to_user']);
+    }).then(function(Info){
+        responData.message = '好友申请成功！';
+        responData.Hailsinfo = Info;
+        res.json(responData);
+        return;
+    })
+})
+//请求自己的所有好友情况
+router.get('/user/getAllHailsInfo',function(req,res){
+    Hails.find({from_user : req.userInfo._id}).populate(['from_user','to_user']).then(function(Info){
+        responData.Hailsinfo = Info;
+        res.json(responData);
+        return;
+    })
+})
+//同意好友请求
+router.get('/user/FriendRequestAgree',function(req,res){
+    
+})
+//请求好友列表
 module.exports = router;

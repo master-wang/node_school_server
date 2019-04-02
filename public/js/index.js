@@ -1,85 +1,85 @@
 $(function(){
     
     //提交评论
-    var comments 
-    $('#messageBtn').on('click',function(){
-        $.ajax({
-            type:'post',
-            url:'/api/comment/post',
-            data:{
-                contentId:$('#contentId').val(),
-                messageContent:$('#messageContent').val()
-            },
-            dataType:'json',
-            success:function(result){
-                $('#messageContent').val('');
-                comments = result.data.comments.reverse();
-                renderComment();
-            }
-        });
-    })
+    // var comments 
+    // $('#messageBtn').on('click',function(){
+    //     $.ajax({
+    //         type:'post',
+    //         url:'/api/comment/post',
+    //         data:{
+    //             contentId:$('#contentId').val(),
+    //             messageContent:$('#messageContent').val()
+    //         },
+    //         dataType:'json',
+    //         success:function(result){
+    //             $('#messageContent').val('');
+    //             comments = result.data.comments.reverse();
+    //             renderComment();
+    //         }
+    //     });
+    // })
     //分页
-    var parerPage=2;
-    var page = 1;
-    var pages = 0;
+    // var parerPage=2;
+    // var page = 1;
+    // var pages = 0;
    
 
-    $.ajax({
-        url:'/api/comment',
-        data:{
-            contentId:$('#contentId').val()
-        },
-        dataType:'json',
-        success:function(result){
-            comments = result.data.comments.reverse();
-            renderComment();
-        }
-    });
+    // $.ajax({
+    //     url:'/api/comment',
+    //     data:{
+    //         contentId:$('#contentId').val()
+    //     },
+    //     dataType:'json',
+    //     success:function(result){
+    //         comments = result.data.comments.reverse();
+    //         renderComment();
+    //     }
+    // });
 
-    $('.pager ').delegate('a','click',function(){
-        if($(this).parent().hasClass('previous')){
-            page--;
-        }else{
-            page++;
-        }
-        renderComment();
-    })
-    function renderComment(){
-        $('#messageCount').html(comments.length);
-        pages = Math.ceil(comments.length / parerPage);
-        var start = (page-1)*parerPage;
-        var end = start+parerPage;
-        var lis = $('.pager li');
-        lis.eq(1).html(page + '/'+pages);
-        if(page<=1){
-            page=1;
-            lis.eq(0).html("没有上一页了");
-        }else{
-            lis.eq(0).html('<a href="javascript:;">上一页</a>');
-        }
-        if(page>=pages){
-            page=pages;
-            lis.eq(2).html("没有下一页了");
-        }else{
-            lis.eq(2).html('<a href="javascript:;">下一页</a>');
-        }
-        if(end>=comments.length){
-            end=comments.length
-        }
+    // $('.pager ').delegate('a','click',function(){
+    //     if($(this).parent().hasClass('previous')){
+    //         page--;
+    //     }else{
+    //         page++;
+    //     }
+    //     renderComment();
+    // })
+    // function renderComment(){
+    //     $('#messageCount').html(comments.length);
+    //     pages = Math.ceil(comments.length / parerPage);
+    //     var start = (page-1)*parerPage;
+    //     var end = start+parerPage;
+    //     var lis = $('.pager li');
+    //     lis.eq(1).html(page + '/'+pages);
+    //     if(page<=1){
+    //         page=1;
+    //         lis.eq(0).html("没有上一页了");
+    //     }else{
+    //         lis.eq(0).html('<a href="javascript:;">上一页</a>');
+    //     }
+    //     if(page>=pages){
+    //         page=pages;
+    //         lis.eq(2).html("没有下一页了");
+    //     }else{
+    //         lis.eq(2).html('<a href="javascript:;">下一页</a>');
+    //     }
+    //     if(end>=comments.length){
+    //         end=comments.length
+    //     }
 
-        var html=``;
-        for(var i = start;i<end;i++){
-            html+=`
-            <p class="name clear">
-                <span class="fl">${comments[i].username}</span><span class="fl">${formateData(comments[i].postTime)}</span>
-            </p>
-            <p class="name clear">
-                ${comments[i].content}
-            </p>
-            `
-        }
-        $('#commentsList').html(html);
-    }
+    //     var html=``;
+    //     for(var i = start;i<end;i++){
+    //         html+=`
+    //         <p class="name clear">
+    //             <span class="fl">${comments[i].username}</span><span class="fl">${formateData(comments[i].postTime)}</span>
+    //         </p>
+    //         <p class="name clear">
+    //             ${comments[i].content}
+    //         </p>
+    //         `
+    //     }
+    //     $('#commentsList').html(html);
+    // }
 
     function formateData(d){
         var date = new Date(d);
@@ -139,6 +139,7 @@ $(function(){
                         <th style="text-align:center;">班级</th>
                         <th style="text-align:center;">性别</th>
                         <th style="text-align:center;">是否单身</th>
+                        <th style="text-align:center;">操作</th>
                     </tr>
                     </thead>
                     <tfoot>
@@ -149,6 +150,14 @@ $(function(){
                         <td>{{user.Class}}</td>
                         <td>{{user.sex}}</td>
                         <td>{{user.danshen}}</td>
+                        <td>
+                            <div v-if="user._id != userInfo._id">
+                                <button v-if="user.hail_stadus == 'none'" class="btn btn-primary" @click="request_hail(user._id)">添加好友</button>
+                                <button v-if="user.hail_stadus == '等待同意'" type="button" class="btn btn-info">等待同意</button>
+                                <button v-if="user.hail_stadus == '已是好友'" class="btn btn-success">已是好友</button>
+                            </div>
+                            <button v-if="user._id == userInfo._id" type="button" class="btn btn-default">我</button>
+                        </td>
                     </tr>
                     </tfoot>
                 </table>
@@ -175,6 +184,9 @@ $(function(){
                         danshen:'单身'
                     }
                 ],
+                hail_user_id:'',
+                hailsIdList:[],
+                
             }
         },
         methods:{
@@ -188,6 +200,51 @@ $(function(){
                     url:'/api/user/getAllList',
                     success:function(result){
                         that.usersList=result.usersList;
+                        that.usersList.forEach(item => item.hail_stadus = 'none' )
+                    }
+                });
+            },
+            request_hail(user_id){
+                var that = this;
+                $.ajax({
+                    type:'get',
+                    url:'/api/user/FriendRequest?to_id='+user_id,
+                    success:function(result){
+                        console.log(result);
+                        that.hailsIdList=result.Hailsinfo;
+                        // that.usersList.forEach(function(item){
+                        //     that.hailsIdList.forEach(function(h){
+                        //         if(item._id==h.to_user._id&&h.isFirends==false){
+                        //             item.hail_stadus = '等待同意'
+                        //         }
+                        //         else if(item._id==h.to_user._id&&h.isFirends!=false){
+                        //             item.hail_stadus = '已是好友'
+                        //         }else{
+                        //             item.hail_stadus = 'none'
+                        //         }
+                        //     })
+                        // })
+                    }
+                });
+            },
+            request_Allhails(){
+                var that = this;
+                $.ajax({
+                    type:'get',
+                    url:'/api/user/getAllHailsInfo',
+                    success:function(result){
+                        console.log(result)
+                        that.hailsIdList=result.Hailsinfo;
+                        that.usersList.forEach(function(item){
+                            that.hailsIdList.forEach(function(h){
+                                if(item._id==h.to_user._id&&h.isFirends==false){
+                                    item.hail_stadus = '等待同意'
+                                }
+                                if(item._id==h.to_user._id&&h.isFirends!=false){
+                                    item.hail_stadus = '已是好友'
+                                }
+                            })
+                        })
                     }
                 });
             }
@@ -196,6 +253,16 @@ $(function(){
             searched_data: function () {
                 let arrList = [];//存放数据
                 let me = this;
+                me.usersList.forEach(function(item){
+                    me.hailsIdList.forEach(function(h){
+                        if(item._id==h.to_user._id&&h.isFirends==false){
+                            item.hail_stadus = '等待同意'
+                        }
+                        else if(item._id==h.to_user._id&&h.isFirends!=false){
+                            item.hail_stadus = '已是好友'
+                        }
+                    })
+                })
                 let list = this.usersList;
                 for (let i = 0;i < list.length;i++){
                     if (list[i].nicheng.search(me.seach_info.nicheng) != -1&&
@@ -207,25 +274,27 @@ $(function(){
                         arrList.push(list[i]);
                     }
                 }
+                
                 return arrList;
-            }
+            },
         },
         created() {
             this.userInfo=JSON.parse(localStorage.getItem('userInfo'));
             this.getAllUserList();
+            this.request_Allhails();
         }
     }
-    var friends = {
+    var Hailrequestinfo = {
         template : `
             <div>
-            <div class="box">
-
-            <div class="box1">
-                <div class="box1-nav1"><img src="/public/imgs/pict1.jpg"><span>张三</span></div>
-                <div class="box1-nav2"><img src="/public/imgs/pict2.jpg"><span>李四</span></div>
-                <div class="box1-nav3"><img src="/public/imgs/pict3.jpg"><span>王二麻子</span></div>
+                <h1>info</h1>
+                <h3> 好友请求</h3>
             </div>
-            <div class="box2">
+        `
+    }
+    var Hailchatinfo = {
+        template : `
+            <div>
                 <div class="box2-nav">张三</div>
                 <div class="box2-nav1">
                     <ul class="message">
@@ -238,11 +307,50 @@ $(function(){
                     <button class="submit btn btn-primary" type="button" name="submit">发送</button>
                 </div>
             </div>
+        `
+    }
+    var friends = {
+        template : `
+            <div>
+            <div class="box">
+
+                <div class="box1">
+                    <router-link to='/schoolFriends/friends/Hailrequestinfo'><div class="box1-nav1"><img src="/public/imgs/info.png"><span>好友请求</span></div></router-link>
+                    <router-link to='/schoolFriends/friends/Hailchatinfo'><div class="box1-nav1"><img src="/public/imgs/pict1.jpg"><span>张三</span></div></router-link>
+                    <div class="box1-nav2"><img src="/public/imgs/pict2.jpg"><span>李四</span></div>
+                    <div class="box1-nav3"><img src="/public/imgs/pict3.jpg"><span>王二麻子</span></div>
+                    <div class="box1-nav1"><img src="/public/imgs/pict1.jpg"><span>张三</span></div>
+                    <div class="box1-nav2"><img src="/public/imgs/pict2.jpg"><span>李四</span></div>
+                    <div class="box1-nav3"><img src="/public/imgs/pict3.jpg"><span>王二麻子</span></div>
+                    <div class="box1-nav1"><img src="/public/imgs/pict1.jpg"><span>张三</span></div>
+                    <div class="box1-nav2"><img src="/public/imgs/pict2.jpg"><span>李四</span></div>
+                    <div class="box1-nav3"><img src="/public/imgs/pict3.jpg"><span>王二麻子</span></div>
+                    <div class="box1-nav1"><img src="/public/imgs/pict1.jpg"><span>张三</span></div>
+                    <div class="box1-nav2"><img src="/public/imgs/pict2.jpg"><span>李四</span></div>
+                    <div class="box1-nav3"><img src="/public/imgs/pict3.jpg"><span>王二麻子</span></div>
+                </div>
+                <div class="box2">
+                    <router-view></router-view> 
+                </div>
     
-        </div>
+            </div>
             </div>
             
-        `
+        `,
+        data:function(){
+            return {
+                userInfo:{},
+            }
+        },
+        methods:{
+            
+        },
+        computed: {
+            
+        },
+        created() {
+            this.userInfo=JSON.parse(localStorage.getItem('userInfo'));
+        }
     }
     var schoolFriends={
         template : `
@@ -962,7 +1070,19 @@ $(function(){
                 },
                 {
                     path : '/scgoolBoard/friends',
-                    component : friends
+                    component : friends,
+                    children:[
+                        {
+                            path : '/schoolFriends/friends/Hailrequestinfo',
+                            component : Hailrequestinfo
+                
+                        },
+                        {
+                            path : '/schoolFriends/friends/Hailchatinfo',
+                            component : Hailchatinfo
+                
+                        },
+                    ]
         
                 },
             ]

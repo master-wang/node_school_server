@@ -203,47 +203,46 @@ textarea:focus {
 
 .box1 {
     position: absolute;
+    overflow-y: scroll;
     left: 0;
     width: 30%;
     height: 100%;
     background-color: rgb(231, 227, 227);
 }
 
-.box1>div {
-    position: absolute;
+.box1 div {
     left: 0;
     width: 100%;
     height: 60px;
     border-bottom:1px solid #ccc;
     line-height: 60px;
 }
-.box1>div:hover{
+.box1 div:hover{
     background-color: rgba(136, 132, 132, 0.3);
 }
-.box1>.box1-nav1{
+.box1 .box1-nav1{
     top: 0px;
 }
-.box1>.box1-nav2{
+.box1 .box1-nav2{
     top: 65px;
 }
-.box1>.box1-nav3{
+.box1 .box1-nav3{
     top: 130px;
 }
 
-.box1>div>img {
-    margin: 10px;
+.box1 div img {
+    margin-top: 10px;
     margin-left: 30px;
+    float: left;
     width: 45px;
     height: 45px;
     border-radius:50%;
 }
 
-.box1>div>span {
-    position: absolute;
+.box1 div span {
     left: 5px;
     top: 20px;
     display: inline-block;
-    height: 100%;
 }
 
 .box2 {
