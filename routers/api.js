@@ -413,17 +413,39 @@ router.get('/user/FriendRequest',function(req,res){
         return;
     })
 })
-//请求自己的所有好友情况
+//请求自己的或者自己请求的 所有好友情况
 router.get('/user/getAllHailsInfo',function(req,res){
+    var arr = []
     Hails.find({from_user : req.userInfo._id}).populate(['from_user','to_user']).then(function(Info){
-        responData.Hailsinfo = Info;
+        console.log("1111111111111111111111111111")
+        arr.push(Info)
+        console.log(Info)
+        return Hails.find({to_user : req.userInfo._id}).populate(['from_user','to_user']);
+    }).then(function(Info){
+        console.log(Info)
+        arr.push(Info)
+        console.log(arr)
+        responData.Hailsinfo = arr;
         res.json(responData);
-        return;
     })
 })
 //同意好友请求
 router.get('/user/FriendRequestAgree',function(req,res){
-    
+    var to_id = req.query.to_id;
+    console.log(to_id);
+    Hails.update({
+        from_user:to_id,
+        to_user:req.userInfo._id,
+    },{
+        isFirends:true
+    }).then(function(info){
+        console.log(info)
+        return Hails.find({from_user : req.userInfo._id}).populate(['from_user','to_user']);
+    }).then(function(Info){
+        responData.Hailsinfo = Info;
+        res.json(responData);
+        return;
+    });
 })
 //请求好友列表
 module.exports = router;

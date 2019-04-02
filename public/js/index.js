@@ -81,10 +81,10 @@ $(function(){
     //     $('#commentsList').html(html);
     // }
 
-    function formateData(d){
-        var date = new Date(d);
-        return date.getFullYear()+'年'+date.getMonth()+'月'+date.getDate()+'时'+date.getHours() +':'+date.getMinutes()+':'+date.getSeconds();
-    }
+    // function formateData(d){
+    //     var date = new Date(d);
+    //     return date.getFullYear()+'年'+date.getMonth()+'月'+date.getDate()+'时'+date.getHours() +':'+date.getMinutes()+':'+date.getSeconds();
+    // }
 
     //页面的 vue 的实例
     var index = {
@@ -287,10 +287,83 @@ $(function(){
     var Hailrequestinfo = {
         template : `
             <div>
-                <h1>info</h1>
-                <h3> 好友请求</h3>
+                <h1>好友请求</h1>
+                <table class="table table-striped table-hover">
+                    <thead>
+                    <tr>
+                        <th  style="text-align:center;">用户名</th>
+                        <th style="text-align:center;">昵称</th>
+                        <th style="text-align:center;">院系</th>
+                        <th style="text-align:center;">班级</th>
+                        <th style="text-align:center;">性别</th>
+                        <th style="text-align:center;">是否单身</th>
+                        <th style="text-align:center;">操作</th>
+                    </tr>
+                    </thead>
+                    <tfoot>
+                    <tr v-for="user in hail_req_notagree">
+                        <td>{{user.to_user.username}}</td>
+                        <td>{{user.to_user.nicheng}}</td>
+                        <td>{{user.to_user.faculty}}</td>
+                        <td>{{user.to_user.Class}}</td>
+                        <td>{{user.to_user.sex}}</td>
+                        <td>{{user.to_user.danshen}}</td>
+                        <td>
+                            <button @click="agree_friends(user.to_user._id)" type="button" class="btn btn-info">同意好友请求</button>
+                        </td>
+                    </tr>
+                    </tfoot>
+                </table>
             </div>
-        `
+        `,
+        data:function(){
+            return {
+                userInfo:{},
+                hailsIdList:[],
+            }
+        },
+        methods:{
+            request_Allhails(){
+                var that = this;
+                $.ajax({
+                    type:'get',
+                    url:'/api/user/getAllHailsInfo',
+                    success:function(result){
+                        console.log(result)
+                        that.hailsIdList=result.Hailsinfo;
+                    }
+                });
+            },
+            agree_friends(to_id){
+                var that = this;
+                console.log(to_id);
+                $.ajax({
+                    type:'get',
+                    url:'/api/user/FriendRequestAgree?to_id='+to_id,
+                    success:function(result){
+                        console.log(result)
+                        that.hailsIdList=result.Hailsinfo;
+                        that.$emit('agree',that.hailsIdList)
+                    }
+                });
+            }
+        },
+        computed: {
+            hail_req_notagree:function(){
+                var arr  = [];
+                var that = this;
+                that.hailsIdList.forEach(function(item){
+                    if(item.isFirends==false && item.to_user._id==that.userInfo._id){
+                        arr.push(item);
+                    }
+                })
+                return arr;
+            },
+        },
+        created() {
+            this.userInfo=JSON.parse(localStorage.getItem('userInfo'));
+            this.request_Allhails();
+        }
     }
     var Hailchatinfo = {
         template : `
@@ -315,19 +388,10 @@ $(function(){
             <div class="box">
 
                 <div class="box1">
-                    <router-link to='/schoolFriends/friends/Hailrequestinfo'><div class="box1-nav1"><img src="/public/imgs/info.png"><span>好友请求</span></div></router-link>
-                    <router-link to='/schoolFriends/friends/Hailchatinfo'><div class="box1-nav1"><img src="/public/imgs/pict1.jpg"><span>张三</span></div></router-link>
-                    <div class="box1-nav2"><img src="/public/imgs/pict2.jpg"><span>李四</span></div>
-                    <div class="box1-nav3"><img src="/public/imgs/pict3.jpg"><span>王二麻子</span></div>
-                    <div class="box1-nav1"><img src="/public/imgs/pict1.jpg"><span>张三</span></div>
-                    <div class="box1-nav2"><img src="/public/imgs/pict2.jpg"><span>李四</span></div>
-                    <div class="box1-nav3"><img src="/public/imgs/pict3.jpg"><span>王二麻子</span></div>
-                    <div class="box1-nav1"><img src="/public/imgs/pict1.jpg"><span>张三</span></div>
-                    <div class="box1-nav2"><img src="/public/imgs/pict2.jpg"><span>李四</span></div>
-                    <div class="box1-nav3"><img src="/public/imgs/pict3.jpg"><span>王二麻子</span></div>
-                    <div class="box1-nav1"><img src="/public/imgs/pict1.jpg"><span>张三</span></div>
-                    <div class="box1-nav2"><img src="/public/imgs/pict2.jpg"><span>李四</span></div>
-                    <div class="box1-nav3"><img src="/public/imgs/pict3.jpg"><span>王二麻子</span></div>
+                    <router-link to='/schoolFriends/friends/Hailrequestinfo' @agree="sonrouter_agreehail"><div class="box1-nav1"><img src="/public/imgs/info.png"><span style="color:red">好友请求({{hail_req_notagree.length}})</span></div></router-link>
+                    <div  v-for="user in hails">
+                    <router-link to='/schoolFriends/friends/Hailchatinfo'><div class="box1-nav1"><img :src="user.to_user.head_img"><span>{{user.to_user.username}}</span></div></router-link>
+                    </div>
                 </div>
                 <div class="box2">
                     <router-view></router-view> 
@@ -340,16 +404,52 @@ $(function(){
         data:function(){
             return {
                 userInfo:{},
+                hailsIdList:[],
+                user_click_color:''
             }
         },
         methods:{
-            
+            request_Allhails(){
+                var that = this;
+                console.log(0)
+                $.ajax({
+                    type:'get',
+                    url:'/api/user/getAllHailsInfo',
+                    success:function(result){
+                        console.log(result)
+                        that.hailsIdList=result.Hailsinfo;
+                    }
+                });
+            },
+            sonrouter_agreehail(list){
+                this.hailsIdList=list;
+            }
         },
         computed: {
-            
+            hail_req_notagree:function(){
+                var arr  = [];
+                var that = this;
+                that.hailsIdList.forEach(function(item){
+                    if(item.isFirends==false && item.to_user._id==that.userInfo._id){
+                        arr.push(item);
+                    }
+                })
+                return arr;
+            },
+            hails:function(){
+                var arr  = [];
+                var that = this;
+                this.hailsIdList.forEach(function(item){
+                    if(item.isFirends==true){
+                        arr.push(item);
+                    }
+                })
+                return arr;
+            }
         },
         created() {
             this.userInfo=JSON.parse(localStorage.getItem('userInfo'));
+            this.request_Allhails();
         }
     }
     var schoolFriends={
@@ -395,7 +495,7 @@ $(function(){
                         <div class="content">
                             <div class="client">
                                 <img :src="board.b_release.head_img">
-                                <p>{{board.b_release.nicheng}}&nbsp;&nbsp;&nbsp;&nbsp;{{board.b_release.faculty}}&nbsp;&nbsp;&nbsp;&nbsp;{{board.b_release.Class}}<br/>{{board.b_cTime}} <span style="floatLright:margin-right:-130px">浏览量 {{board.views}}
+                                <p>{{board.b_release.nicheng}}&nbsp;&nbsp;&nbsp;&nbsp;{{board.b_release.faculty}}&nbsp;&nbsp;&nbsp;&nbsp;{{board.b_release.Class}}<br/>{{formateData(board.b_cTime)}} <span style="floatLright:margin-right:-130px">浏览量 {{board.views}}
                                     <button v-if="board.b_release._id==userInfo._id" type="button" class="btn btn-danger" @click="BoardsDelete(board._id)">删除</button>
                                     <button class="btn btn-primary" @click="oneBoardGet(board._id)">详情</button>
                                 </span></p>
@@ -423,7 +523,7 @@ $(function(){
                         <div v-for="c in selectThree(board.comments)">
                             
                             <p><a href="#">{{c.username}}:</a>{{c.content}}
-                                <span  >{{c.postTime}}</span>
+                                <span  >{{formateData(c.postTime)}}</span>
                                 <button v-if="board.b_release._id==userInfo._id" type="button" class="btn btn-danger" @click="conmentDelete(c,board._id)">删除</button>
                             </p>
                         </div>
@@ -441,6 +541,10 @@ $(function(){
             }
         },
         methods:{
+            formateData(d){
+                var date = new Date(d);
+                return date.getFullYear()+'年'+date.getMonth()+'月'+date.getDate()+'时'+date.getHours() +':'+date.getMinutes()+':'+date.getSeconds();
+            },
             getBoardInfo(){
                 var that = this;
                 console.log(that.item);
