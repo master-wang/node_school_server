@@ -155,6 +155,7 @@ $(function(){
                                 <button v-if="user.hail_stadus == 'none'" class="btn btn-primary" @click="request_hail(user._id)">添加好友</button>
                                 <button v-if="user.hail_stadus == '等待同意'" type="button" class="btn btn-info">等待同意</button>
                                 <button v-if="user.hail_stadus == '已是好友'" class="btn btn-success">已是好友</button>
+                                <button v-if="user.hail_stadus == '对方已申请'" type="button" class="btn btn-warning">对方已申请</button>
                             </div>
                             <button v-if="user._id == userInfo._id" type="button" class="btn btn-default">我</button>
                         </td>
@@ -255,11 +256,14 @@ $(function(){
                 let me = this;
                 me.usersList.forEach(function(item){
                     me.hailsIdList.forEach(function(h){
-                        if(item._id==h.to_user._id&&h.isFirends==false){
+                        if(item._id==h.to_user._id&&h.isFirends==false&&h.from_user._id==me.userInfo._id){
                             item.hail_stadus = '等待同意'
                         }
-                        else if(item._id==h.to_user._id&&h.isFirends!=false){
+                        else if(item._id==h.from_user._id&&h.isFirends==true&&h.to_user._id==me.userInfo._id){
                             item.hail_stadus = '已是好友'
+                        }
+                        if(item._id==h.from_user._id&&h.isFirends==false&&h.to_user._id==me.userInfo._id){
+                            item.hail_stadus = '对方已申请'
                         }
                     })
                 })
@@ -302,14 +306,14 @@ $(function(){
                     </thead>
                     <tfoot>
                     <tr v-for="user in hail_req_notagree">
-                        <td>{{user.to_user.username}}</td>
-                        <td>{{user.to_user.nicheng}}</td>
-                        <td>{{user.to_user.faculty}}</td>
-                        <td>{{user.to_user.Class}}</td>
-                        <td>{{user.to_user.sex}}</td>
-                        <td>{{user.to_user.danshen}}</td>
+                        <td>{{user.from_user.username}}</td>
+                        <td>{{user.from_user.nicheng}}</td>
+                        <td>{{user.from_user.faculty}}</td>
+                        <td>{{user.from_user.Class}}</td>
+                        <td>{{user.from_user.sex}}</td>
+                        <td>{{user.from_user.danshen}}</td>
                         <td>
-                            <button @click="agree_friends(user.to_user._id)" type="button" class="btn btn-info">同意好友请求</button>
+                            <button @click="agree_friends(user.from_user._id)" type="button" class="btn btn-info">同意好友请求</button>
                         </td>
                     </tr>
                     </tfoot>
@@ -334,12 +338,12 @@ $(function(){
                     }
                 });
             },
-            agree_friends(to_id){
+            agree_friends(from_user_id){
                 var that = this;
-                console.log(to_id);
+                console.log(from_user_id);
                 $.ajax({
                     type:'get',
-                    url:'/api/user/FriendRequestAgree?to_id='+to_id,
+                    url:'/api/user/FriendRequestAgree?from_user_id='+from_user_id,
                     success:function(result){
                         console.log(result)
                         that.hailsIdList=result.Hailsinfo;
@@ -368,19 +372,113 @@ $(function(){
     var Hailchatinfo = {
         template : `
             <div>
-                <div class="box2-nav">张三</div>
-                <div class="box2-nav1">
+                <div class="box2-nav">{{name}}</div>
+                <div class="box2-nav1" id="scotop">
                     <ul class="message">
-                        <li class="left1"><img src="/public/imgs/pict1.jpg"></li> <li class="left2">111uuuuuuu1</li>
-                        <li class="right1">222</li> <li class="right2"><img src="/public/imgs/pict2.jpg"></li>
+                        <div v-for="chat in chats" class="chatitem">
+                            <div v-if="userInfo.username !== chat.name">
+                                <li class="left1"><img :src="he_img"><span>{{chat.chatmag}}</span>  </li>
+                            </div>
+                            <div v-if="userInfo.username == chat.name" >
+                                <li class="right1"><span>{{chat.chatmag}}</span><img :src="userInfo.head_img"></li> 
+                            </div>
+                            
+                        </div>
                     </ul>
                 </div>
                 <div class="box2-nav2">
-                    <textarea></textarea>
-                    <button class="submit btn btn-primary" type="button" name="submit">发送</button>
+                    <textarea v-model="chatmag"></textarea>
+                    <button class="submit btn btn-primary" type="button" @click="chat_post()" name="submit">发送</button>
                 </div>
             </div>
-        `
+        `,
+        data:function(){
+            return {
+                userInfo:{},
+                chatmag:'',
+                chat_id:'',
+                he_img:'',
+                chats:[],
+                name:'',
+                timer:null,
+                box_height:''
+            }
+        },
+        methods:{
+            chat_post(){
+                var that = this;
+                var data = {
+                    chatmag:this.chatmag,
+                    chat_id:this.chat_id,
+                    name:this.userInfo.username
+                }
+                if (this.chatmag == ''){
+                    alert("消息不能为空！");
+                }
+                else{
+                    $.ajax({
+                        type:'post',
+                        url:'/api/user/chatsAdd',
+                        data:data,
+                        dataType:'json',
+                        success:function(result){
+                           console.log(result);
+                           that.chatmag = '';
+                           that.chats = result.newinfo.chatInfos;
+                           $("#scotop").scrollTop($("#scotop")[0].scrollHeight);
+                        }
+                    });
+                }
+            },
+            getChatInfos(char_Id){
+                console.log(char_Id);
+                var that = this;
+                $.ajax({
+                    type:'get',
+                    url:'/api/user/chatInfoGetAll?charId='+char_Id,
+                    success:function(result){
+                        console.log(result)
+                        that.chatmag = '';
+                        that.chats = result.newinfo.chatInfos;
+                        setTimeout(function(){
+                            $("#scotop").scrollTop($("#scotop")[0].scrollHeight);
+                        },20)
+                    }
+                });
+            },
+            zidong_getInfo(char_Id){
+                var that = this;
+                $.ajax({
+                    type:'get',
+                    url:'/api/user/chatInfoGetAll?charId='+char_Id,
+                    success:function(result){
+                        console.log(result)
+                        that.chats = result.newinfo.chatInfos;
+                    }
+                });
+            },
+            formateData(d){
+                var date = new Date(d);
+                return date.getFullYear()+'年'+date.getMonth()+'月'+date.getDate()+'时'+date.getHours() +':'+date.getMinutes()+':'+date.getSeconds();
+            },
+        },
+        created() {
+            this.userInfo=JSON.parse(localStorage.getItem('userInfo'));
+            this.he_img=this.$route.query.img;
+            this.chat_id=this.$route.query.id;
+            this.name = this.$route.query.name;
+            this.getChatInfos(this.$route.query.id);
+            var that = this;
+            this.timer = setInterval(function(){
+                that.zidong_getInfo(that.$route.query.id);
+            },2000)
+            
+
+        },
+        destroyed(){
+            clearInterval(this.timer);
+        }
+
     }
     var friends = {
         template : `
@@ -388,13 +486,14 @@ $(function(){
             <div class="box">
 
                 <div class="box1">
-                    <router-link to='/schoolFriends/friends/Hailrequestinfo' @agree="sonrouter_agreehail"><div class="box1-nav1"><img src="/public/imgs/info.png"><span style="color:red">好友请求({{hail_req_notagree.length}})</span></div></router-link>
+                    <router-link to='/schoolFriends/friends/Hailrequestinfo' ><div class="box1-nav1"><img src="/public/imgs/info.png"><span style="color:red">好友请求({{hail_req_notagree.length}})</span></div></router-link>
                     <div  v-for="user in hails">
-                    <router-link to='/schoolFriends/friends/Hailchatinfo'><div class="box1-nav1"><img :src="user.to_user.head_img"><span>{{user.to_user.username}}</span></div></router-link>
+                    <div v-if="user.from_user._id == userInfo._id" @click="go_to_chat(user._id,user.to_user.head_img,user.to_user.username)"><div class="box1-nav1"><img :src="user.to_user.head_img"><span>{{user.to_user.username}}</span></div></div>
+                    <div v-if="user.from_user._id != userInfo._id" @click="go_to_chat(user._id,user.from_user.head_img,user.from_user.username)"><div class="box1-nav1"><img :src="user.from_user.head_img"><span>{{user.from_user.username}}</span></div></div>
                     </div>
                 </div>
                 <div class="box2">
-                    <router-view></router-view> 
+                    <router-view @agree="sonrouter_agreehail"></router-view> 
                 </div>
     
             </div>
@@ -422,7 +521,18 @@ $(function(){
                 });
             },
             sonrouter_agreehail(list){
+                console.log(list);
                 this.hailsIdList=list;
+            },
+            go_to_chat(id,img,name){
+                this.$router.push({
+                    path: '/schoolFriends/friends/Hailchatinfo',
+                    query: {
+                        id,
+                        img,
+                        name
+                    }
+                  })
             }
         },
         computed: {

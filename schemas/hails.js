@@ -13,5 +13,9 @@ module.exports = new mongoose.Schema({
         type:Boolean,
         default:false
     },
+    chatInfos: {//存储两人的对话
+        type:Array,
+        default:[]
+    },
 
 });

@@ -172,6 +172,9 @@ router.post('/user/UpateInfoImg',upload.single('photo'),function(req,res){
     },{
         head_img:imgpath
     }).then(function(info){
+        imgpath = '/public/upimgs/';
+        user_img = '';
+        Bod_imgs = []
         if(!info){
 
         }
@@ -267,6 +270,7 @@ router.post('/boards/addInfoImg',upload.array("file",20),function(req,res){
         b_disc,b_disc,
         b_release:req.userInfo._id.toString()
     }).save().then(function(Boardinfo){
+        Bod_imgs = []
         console.log(Boardinfo);
         responData.message = '图片上传成功成功！';
         req.cookies.set('addBoard_id',JSON.stringify(
@@ -415,26 +419,32 @@ router.get('/user/FriendRequest',function(req,res){
 })
 //请求自己的或者自己请求的 所有好友情况
 router.get('/user/getAllHailsInfo',function(req,res){
+    var arr1 = [];
+    var arr2 = []
     var arr = []
     Hails.find({from_user : req.userInfo._id}).populate(['from_user','to_user']).then(function(Info){
         console.log("1111111111111111111111111111")
-        arr.push(Info)
+        arr1=Info;
         console.log(Info)
         return Hails.find({to_user : req.userInfo._id}).populate(['from_user','to_user']);
     }).then(function(Info){
         console.log(Info)
-        arr.push(Info)
-        console.log(arr)
+        arr2 = Info;
+        arr =arr1.concat(arr2);
+        console.log(arr);
         responData.Hailsinfo = arr;
         res.json(responData);
     })
 })
 //同意好友请求
 router.get('/user/FriendRequestAgree',function(req,res){
-    var to_id = req.query.to_id;
-    console.log(to_id);
+    var from_user_id = req.query.from_user_id;
+    console.log(from_user_id);
+    var arr1 = [];
+    var arr2 = []
+    var arr = []
     Hails.update({
-        from_user:to_id,
+        from_user:from_user_id,
         to_user:req.userInfo._id,
     },{
         isFirends:true
@@ -442,10 +452,49 @@ router.get('/user/FriendRequestAgree',function(req,res){
         console.log(info)
         return Hails.find({from_user : req.userInfo._id}).populate(['from_user','to_user']);
     }).then(function(Info){
-        responData.Hailsinfo = Info;
+        arr1=Info;
+       
+        return Hails.find({to_user : req.userInfo._id}).populate(['from_user','to_user']);
+    }).then(function(Info){
+        arr2 = Info;
+        arr =arr1.concat(arr2);
+        console.log(arr);
+        responData.Hailsinfo = arr;
         res.json(responData);
-        return;
     });
 })
-//请求好友列表
+//保存两个人的聊天对话
+router.post('/user/chatsAdd',function(req,res){
+    var char_Id = req.body.chat_id || '';
+    var chatmag = req.body.chatmag || '';
+    var name = req.body.name || '';
+    var chatData = {
+        name,
+        chatmag,
+        chatTime:new Date()
+    };
+    Hails.findOne({
+        _id:char_Id
+    }).then(function(info){
+        console.log(info);
+        info.chatInfos.push(chatData);
+        return info.save();
+    }).then(function(newinfo){
+        responData.message = '发送成功！';
+        responData.newinfo = newinfo;
+        res.json(responData);
+    })
+})
+// get 请求两个人的聊天记录
+router.get('/user/chatInfoGetAll',function(req,res){
+    var char_Id = req.query.charId;
+    console.log(char_Id);
+    Hails.findOne({
+        _id:char_Id
+    }).then(function(info){
+        responData.message = '请求聊天成功成功！';
+        responData.newinfo = info;
+        res.json(responData);
+    })
+})
 module.exports = router;

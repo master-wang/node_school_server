@@ -202,7 +202,7 @@ textarea:focus {
 }
 
 .box1 {
-    position: absolute;
+    float: left;
     overflow-y: scroll;
     left: 0;
     width: 30%;
@@ -246,13 +246,14 @@ textarea:focus {
 }
 
 .box2 {
-    position: absolute;
+    float: right;
     right: 0;
     width: 70%;
     height: 100%;
 }
 .box2-nav{
-    height: 7%;
+    height: 30px;
+    width:100%;
     background-color: rgb(245, 243, 243);
     border-bottom: 1px solid rgb(189, 188, 188);
     box-sizing: border-box;
@@ -261,79 +262,98 @@ textarea:focus {
     text-align: center;
 }
 .box2-nav1 {
-    position: absolute;
     width: 100%;
-    height: 68%;
+    height: 480px;
+    overflow-y: scroll
 }
 
-.box2-nav1>.message {
-    position: absolute;
-    top: 0;
-    left: 0;
+.box2-nav1 .message {
     width: 100%;
     height: 100%;
     background-color: rgb(245, 243, 243);
 }
-.box2-nav1>.message img{
+.box2-nav1 .message img{
     width: 40px;
     height: 40px;
-    margin: 10px;
+    margin-right: 10px;
+    margin-left: 10px;
     border-radius:50%;
+    display: inline-block
+}
+.box2-nav1 .message span{
+    width: 200px;
+    height: 60px;
+    margin-right: 10px;
+    margin-left: 10px;
+    display: inline-block
 }
 
-.box2-nav1>.message>.left2, .box2-nav1>.message>.right1 {
+.box2-nav1 .message .left2, .box2-nav1 .message .right1 {
     word-wrap:break-word;  
     word-break:break-all;  
     padding: 5px;
     white-space: wrap;
 }
-.box2-nav1>.message>.left1 {
-   position: absolute;
-   top: 10px;
-   left: 0;
+/* 我的代码 */
+.box2-nav1 .message .chatitem {
+    width: 100%;
+    height: 60px;
+    margin-top: 5px;
+}
+.box2-nav1 .message li{
+    
+    height:50px;
+    width: 100%;
+    line-height: 60px;
+}
+.box2-nav1 .message li.left1 img{
+    float: left;
 }
 
-.box2-nav1>.message>.left2 {
-   position: absolute;
-   top: 25px;
-   left: 65px;
+.box2-nav1 .message li.right1 img{
+    float: right;
+}
+
+/* 你的代码 */
+.box2-nav1 .message .left1 {
+    float: left;
+    background-color: rgb(219, 210, 210);
+}
+
+
+.box2-nav1 .message .left2 {
+    float: left;
+    width: 100px;
    background-color: rgb(219, 210, 210);
 }
 
-.box2-nav1>.message>.right1 {
-   position: absolute;
-   top: 55px;
-  right: 65px;
+.box2-nav1 .message  .right1 {
+    float: right;
+    width: 100;
   background-color: rgb(132, 187, 132);
 }
-.box2-nav1>.message>.right2 {
-   position: absolute;
-   top: 40px;
-   right: 0;
+.box2-nav1 .message .right2 {
+    float: right;
+    width: 100;
  
 }
 
 .box2-nav2 {
-    position: absolute;
-    bottom: 0;
     width: 100%;
     height: 25%;
 }
 
-.box2-nav2>textarea {
-    position: absolute;
+.box2-nav2 textarea {
     top: 0;
     left: 0;
-    width: 100%;
-    height: 65%;
+    width: 60%;
+    float: left;
+    height: 80px;
     box-sizing: border-box;
     border: none;
 }
 
-.box2-nav2>.submit {
-    position: absolute;
-    bottom: 0;
-    right: 0;
+.box2-nav2 .submit {
     width: 20%;
     height: 20%;
     margin: 7px;
