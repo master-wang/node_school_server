@@ -195,6 +195,9 @@ router.get('/user/getAllList',function(req,res){
         console.log(usersList,"11111111111111111111");
         responData.message = '请求公告数据成功！';
         responData.usersList = usersList;
+        responData.usersList.forEach(e => {
+            e.password = "你不需要知道哦。。。"
+        });
         res.json(responData);
     })
 })
@@ -317,6 +320,7 @@ router.get('/boards/getOneBoardinfo',function(req,res){
         console.log(newInfo);
         responData.message = '获取单个公告信息成功！';
         responData.newInfo = newInfo;
+        responData.newInfo.b_release.password = "别乱看。。。"
         res.json(responData);
     })
     
@@ -433,6 +437,10 @@ router.get('/user/getAllHailsInfo',function(req,res){
         arr =arr1.concat(arr2);
         console.log(arr);
         responData.Hailsinfo = arr;
+        responData.Hailsinfo.forEach(function(item){
+            item.from_user.password = '尴尬';
+            item.to_user.password = '尴尬';
+        })
         res.json(responData);
     })
 })

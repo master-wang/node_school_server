@@ -60,8 +60,7 @@ app.use(function(req,res,next){
 })
 //前端的
 app.use('/',require('./routers/main'));
-//后台的
-//app.use('/admin',require('./routers/admin'));
+
 //api接口
 app.use('/api',require('./routers/api'));
 

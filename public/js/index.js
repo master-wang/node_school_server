@@ -1,95 +1,8 @@
 $(function(){
-    
-    //提交评论
-    // var comments 
-    // $('#messageBtn').on('click',function(){
-    //     $.ajax({
-    //         type:'post',
-    //         url:'/api/comment/post',
-    //         data:{
-    //             contentId:$('#contentId').val(),
-    //             messageContent:$('#messageContent').val()
-    //         },
-    //         dataType:'json',
-    //         success:function(result){
-    //             $('#messageContent').val('');
-    //             comments = result.data.comments.reverse();
-    //             renderComment();
-    //         }
-    //     });
-    // })
-    //分页
-    // var parerPage=2;
-    // var page = 1;
-    // var pages = 0;
-   
-
-    // $.ajax({
-    //     url:'/api/comment',
-    //     data:{
-    //         contentId:$('#contentId').val()
-    //     },
-    //     dataType:'json',
-    //     success:function(result){
-    //         comments = result.data.comments.reverse();
-    //         renderComment();
-    //     }
-    // });
-
-    // $('.pager ').delegate('a','click',function(){
-    //     if($(this).parent().hasClass('previous')){
-    //         page--;
-    //     }else{
-    //         page++;
-    //     }
-    //     renderComment();
-    // })
-    // function renderComment(){
-    //     $('#messageCount').html(comments.length);
-    //     pages = Math.ceil(comments.length / parerPage);
-    //     var start = (page-1)*parerPage;
-    //     var end = start+parerPage;
-    //     var lis = $('.pager li');
-    //     lis.eq(1).html(page + '/'+pages);
-    //     if(page<=1){
-    //         page=1;
-    //         lis.eq(0).html("没有上一页了");
-    //     }else{
-    //         lis.eq(0).html('<a href="javascript:;">上一页</a>');
-    //     }
-    //     if(page>=pages){
-    //         page=pages;
-    //         lis.eq(2).html("没有下一页了");
-    //     }else{
-    //         lis.eq(2).html('<a href="javascript:;">下一页</a>');
-    //     }
-    //     if(end>=comments.length){
-    //         end=comments.length
-    //     }
-
-    //     var html=``;
-    //     for(var i = start;i<end;i++){
-    //         html+=`
-    //         <p class="name clear">
-    //             <span class="fl">${comments[i].username}</span><span class="fl">${formateData(comments[i].postTime)}</span>
-    //         </p>
-    //         <p class="name clear">
-    //             ${comments[i].content}
-    //         </p>
-    //         `
-    //     }
-    //     $('#commentsList').html(html);
-    // }
-
-    // function formateData(d){
-    //     var date = new Date(d);
-    //     return date.getFullYear()+'年'+date.getMonth()+'月'+date.getDate()+'时'+date.getHours() +':'+date.getMinutes()+':'+date.getSeconds();
-    // }
-
     //页面的 vue 的实例
     var index = {
         template : `
-            <div>
+            <div style="color:white">
                 <h1>首页</h1>
                 <h3> 欢迎来到西邮娱乐之家</h3>
                 <img  src="/public/imgs/index.jpeg" alt="" style="width:800px;">
@@ -101,7 +14,7 @@ $(function(){
     }
     var classMate = {
         template : `
-            <div>
+            <div id="classMate">
                 <h1>寻找我的校友</h1>
                 <label for="">
                     昵称：<input  v-model="seach_info.nicheng"   type="text" class="form-control" placeholder="昵称：">
@@ -162,6 +75,21 @@ $(function(){
                     </tr>
                     </tfoot>
                 </table>
+                <nav aria-label="Page navigation">
+                    <ul class="pagination">
+                        <li>
+                        <a href="#" aria-label="Previous" @click="minus()">
+                            <span aria-hidden="true" >&laquo;</span>
+                        </a>
+                        </li>
+                        <li v-for="item in fenyesuoying" @click="jumppage(item)"><a href="#">{{item}}</a></li>
+                        <li>
+                        <a href="#" aria-label="Next" @click="plus()">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                        </li>
+                    </ul>
+                </nav>
             </div>
             
         `,
@@ -187,6 +115,11 @@ $(function(){
                 ],
                 hail_user_id:'',
                 hailsIdList:[],
+                //分页
+                parerPage:5,
+                page : 1,
+                pages : 0,
+                fenyesuoying:[]
                 
             }
         },
@@ -248,11 +181,27 @@ $(function(){
                         })
                     }
                 });
+            },
+            minus(){
+                this.page--;
+                if(this.page<=1){
+                    this.page=1;
+                }
+            },
+            plus(){
+                this.page++;
+                if(this.page>=this.pages){
+                    this.page=this.pages;
+                }
+            },
+            jumppage(i){
+                this.page = i;
             }
         },
         computed:{
             searched_data: function () {
                 let arrList = [];//存放数据
+                let fenye = [];
                 let me = this;
                 me.usersList.forEach(function(item){
                     me.hailsIdList.forEach(function(h){
@@ -278,8 +227,39 @@ $(function(){
                         arrList.push(list[i]);
                     }
                 }
-                
-                return arrList;
+                console.log(arrList)
+                //分页
+                this.pages  = Math.ceil(arrList.length / this.parerPage);
+                for(var i=0;i<this.pages ;i++){
+                    fenye.push(i+1);
+                }
+                this.fenyesuoying = fenye;
+                var start = (this.page-1)*this.parerPage;
+                var end = start+this.parerPage;
+                var fenye_arr = []
+                console.log(this.pages+'---'+start+'---'+end);
+                if(this.page<=1){
+                    this.page=1;
+                }
+                if(this.page>=this.pages){
+                    this.page=this.pages;
+                }
+                if(end>=arrList.length){
+                    end=arrList.length
+                }
+                if(arrList.length<this.parerPage){
+                    for(var i=0;i<arrList.length;i++){
+                        fenye_arr.push(arrList[i]);
+                    }
+                    
+                }
+                else{
+                    for(var i=start;i<end;i++){
+                        fenye_arr.push(arrList[i]);
+                    }
+                    
+                }
+                return fenye_arr;
             },
         },
         created() {
@@ -318,12 +298,31 @@ $(function(){
                     </tr>
                     </tfoot>
                 </table>
+                <nav aria-label="Page navigation">
+                    <ul class="pagination">
+                        <li>
+                        <a href="#" aria-label="Previous" @click="minus()">
+                            <span aria-hidden="true" >&laquo;</span>
+                        </a>
+                        </li>
+                        <li v-for="item in fenyesuoying" @click="jumppage(item)"><a href="#">{{item}}</a></li>
+                        <li>
+                        <a href="#" aria-label="Next" @click="plus()">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                        </li>
+                    </ul>
+                </nav>
             </div>
         `,
         data:function(){
             return {
                 userInfo:{},
                 hailsIdList:[],
+                parerPage:5,
+                page : 1,
+                pages : 0,
+                fenyesuoying:[]
             }
         },
         methods:{
@@ -350,18 +349,65 @@ $(function(){
                         that.$emit('agree',that.hailsIdList)
                     }
                 });
+            },
+            minus(){
+                this.page--;
+                if(this.page<=1){
+                    this.page=1;
+                }
+            },
+            plus(){
+                this.page++;
+                if(this.page>=this.pages){
+                    this.page=this.pages;
+                }
+            },
+            jumppage(i){
+                this.page = i;
             }
         },
         computed: {
             hail_req_notagree:function(){
                 var arr  = [];
+                var fenye = [];
                 var that = this;
                 that.hailsIdList.forEach(function(item){
                     if(item.isFirends==false && item.to_user._id==that.userInfo._id){
                         arr.push(item);
                     }
                 })
-                return arr;
+
+                this.pages  = Math.ceil(arr.length / this.parerPage);
+                for(var i=0;i<this.pages ;i++){
+                    fenye.push(i+1);
+                }
+                this.fenyesuoying = fenye;
+                var start = (this.page-1)*this.parerPage;
+                var end = start+this.parerPage;
+                var fenye_arr = []
+                console.log(this.pages+'---'+start+'---'+end);
+                if(this.page<=1){
+                    this.page=1;
+                }
+                if(this.page>=this.pages){
+                    this.page=this.pages;
+                }
+                if(end>=arr.length){
+                    end=arr.length
+                }
+                if(arr.length<this.parerPage){
+                    for(var i=0;i<arr.length;i++){
+                        fenye_arr.push(arr[i]);
+                    }
+                    
+                }
+                else{
+                    for(var i=start;i<end;i++){
+                        fenye_arr.push(arr[i]);
+                    }
+                    
+                }
+                return fenye_arr;
             },
         },
         created() {
@@ -624,19 +670,25 @@ $(function(){
                         <h5>用户评论   (已有{{board.comments.length}}评论)</h5><br>
                         <img :src="userInfo.head_img" alt="">
                         <textarea v-model="addcomInfo" cols="50" rows="2"></textarea>
-                        <span>
-                            <button class="btn btn-primary" @click="addComment(board._id)">发表</button>
+                        <span >
+                            <button style="margin-top: -30px;" class="btn btn-primary" @click="addComment(board._id)">发表</button>
                         </span>
                     </div>
                     <div class="new_discuss">
                         <h5>最新评论</h5>
-                        <div v-for="c in selectThree(board.comments)">
+                        <div v-for="c in selectThree(board.comments)" style="width:100%;height:100px;">
                             
-                            <p><a href="#">{{c.username}}:</a>{{c.content}}
-                                <span  >{{formateData(c.postTime)}}</span>
+                            <span style="float:left;margin-left:20px;" > 
+                            <span>{{c.username}}:</span>
+                            </span>
+                            <span style="float:right;margin-right:20px;">
+                                <span>{{formateData(c.postTime)}}</span>
                                 <button v-if="board.b_release._id==userInfo._id" type="button" class="btn btn-danger" @click="conmentDelete(c,board._id)">删除</button>
-                            </p>
+                            </span>
+                            <br />
+                            <span style="float:left;text-indent:4em">{{c.content}}</span>
                         </div>
+                        
                     </div>
                 </div>
                 
@@ -668,6 +720,9 @@ $(function(){
                     dataType:'json',
                     success:function(result){
                         that.boardsList = result.BoardsList;
+                        that.boardsList.forEach(function(item){
+                            item.b_release.password = '你不需要知道哦！';
+                        })
                     }
                 });
             },
@@ -689,6 +744,9 @@ $(function(){
                     url:'/api/boards/getAllBoardsList',
                     success:function(result){
                         that.boardsList = result.BoardsList;
+                        that.boardsList.forEach(function(item){
+                            item.b_release.password = '你不需要知道哦！';
+                        })
                         
                     }
                 });
@@ -790,7 +848,7 @@ $(function(){
     }
     var boardAdd={
         template : `
-            <div>
+            <div style="color:white">
                 <h1>发布我的公告</h1>
                 <div>
                     <label for="" v-if="userInfo.isAdmin">
@@ -820,17 +878,19 @@ $(function(){
                     </label>
                     <br />
                     <label for="">
-                        描述：<input  v-model="boardInfo.b_disc"  type="text" class="form-control" placeholder="描述">
+                        描述：<textarea v-model="boardInfo.b_disc" name="" id="" cols="30" rows="5" placeholder="描述"></textarea>
+                       
                     </label>
                     <br />
                     <label for="">照片
-                            <input type="file" name="file" id="updateBoard_imgs" accept="image/gif, image/jpeg,image/png,image/jpg" multiple>
+                            <input @change="obvies_imgs" type="file" name="file" id="updateBoard_imgs" accept="image/gif, image/jpeg,image/png,image/jpg" multiple>
                             <img src="" height="100px;width:100px">
-                        <p class="help-block">最多三张图片</p>
+                            <div id="b_imgs_box"></div>
+                        <p class="" style="color:white">最多三张图片</p>
                     </label>
                 </div>
                 <div>
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    
                     <button type="button" class="btn btn-primary" @click="post_boardInfoImg()">发布</button>
                 </div>
             </div>
@@ -848,6 +908,18 @@ $(function(){
             }
         },
         methods:{
+            //返回上一层
+            go_back_router(){
+                this.$router.go(-1);
+            },
+            obvies_imgs(i){
+                var htl = ``;
+                for(var index = 0; index < $('#updateBoard_imgs')[0].files.length; index++){
+                    htl+=`<img style="width:100px;height:100px;margin-left:10px" src="${URL.createObjectURL($("#updateBoard_imgs")[0].files[index])}"></img>`;
+                }
+                $('#b_imgs_box').html(htl);
+                //$("[name='photo']").siblings('img').attr('src',URL.createObjectURL($("#updateUser_touxiang")[0].files[0])); 
+            },
             post_boardInfo(){
                 this.userInfo=JSON.parse(localStorage.getItem('userInfo'));
                 this.boardInfo._id=this.userInfo._id.toString();
@@ -959,19 +1031,28 @@ $(function(){
     var boardView={
         template : `
         <div  class="jumbotron">
-        <div style="margin-top:20px;border:2px solid red">
+        <div style="margin-top:20px;">
             <h3><img :src="board.b_release.head_img" style="width:100px;height:100px;">/{{board.b_release.nicheng}}/{{board.b_release.faculty}}
-            /{{board.b_release.Class}}/{{board.b_cTime}}/<button class="btn btn-primary">浏览量：{{board.views}}）</button>
+            /{{board.b_release.Class}}/{{formateData(board.b_cTime)}}/<button class="btn btn-primary">浏览量：{{board.views}}）</button> <button v-if="board.b_release._id==userInfo._id" type="button" class="btn btn-danger" @click="BoardsDelete(board._id)">删除</button>
             </h3>
             <h3>{{board.b_theme}}</h3>
             <h3>{{board.b_disc}}</h3>
-            <h3><img v-for="img in board.b_img" :src="img" ></h3>
-            <button v-if="board.b_release._id==userInfo._id" type="button" class="btn btn-danger" @click="BoardsDelete(board._id)">删除</button>
-            <div style="border:1px solid blue">
-                <textarea v-model="addcomInfo" name="" id="" cols="30" rows="10"></textarea>
+            <h3><img v-for="img in board.b_img" :src="img" style="width:200px;height:200px;margin-left:10px"></h3>
+           
+            <div>
+                <textarea  v-model="addcomInfo" name="" id="" cols="40" rows="4"></textarea>
                 <button class="btn btn-primary" @click="addComment(board._id)">发表</button>
-                <p v-for="c in board.comments">昵称:<span>{{c.username}}</span>评论：<span>{{c.content}}</span>时间：<span>{{c.postTime}}</span>
-                  <button v-if="board.b_release._id==userInfo._id" type="button" class="btn btn-danger" @click="conmentDelete(c,board._id)">删除</button>
+                <p v-for="c in board.comments" style="width:100%;height:100px;">
+                    <span style="float:left;margin-left:20px;"> 
+                        <span>{{c.username}}:</span>
+                    </span>
+                    <span style="float:right;margin-right:20px;">
+                        <span>{{formateData(c.postTime)}}</span>
+                        <button v-if="board.b_release._id==userInfo._id" type="button" class="btn btn-danger" @click="conmentDelete(c,board._id)">删除</button>
+                    </span>
+                    <br />
+                    <span style="float:left;text-indent:2em">{{c.content}}</span>
+                    
                 </p>
             </div>
         </div>
@@ -988,6 +1069,10 @@ $(function(){
             }
         },
         methods:{
+            formateData(d){
+                var date = new Date(d);
+                return date.getFullYear()+'年'+date.getMonth()+'月'+date.getDate()+'时'+date.getHours() +':'+date.getMinutes()+':'+date.getSeconds();
+            },
             oneBoardGet(b_id){
                 var that = this;
                 $.ajax({
@@ -995,6 +1080,7 @@ $(function(){
                     url:'/api/boards/getOneBoardinfo?id='+b_id,
                     success:function(result){
                         that.board=result.newInfo;
+
                         console.log(that.board);
                     }
                 });
@@ -1101,7 +1187,7 @@ $(function(){
     }
     var updateUserInfo={
         template : `
-            <div>
+            <div style="color:white">
                 <h1>完善个人信息</h1>
                 <div>
                     
@@ -1125,7 +1211,8 @@ $(function(){
                     </label> 
                     <br />
                     <label for="">
-                        描述：<input v-model="update_userInfo.disc" type="text" class="form-control" placeholder="描述">
+                        描述：<textarea v-model="update_userInfo.disc" name="" id="" cols="30" rows="5" placeholder="描述"></textarea>
+                       
                     </label>
                     <br />
                     <label for="">

@@ -49,18 +49,12 @@
                 </ul>
                 </div>
             </div>
-        
+            
             <div class="middle">
                 <!-- 中间信息主题部分 -->
                 <div class="article">
                     <button v-if="!userInfo" class="btn btn-danger">您还没有登录，请先登录</button>
                     <router-view></router-view> 
-                    <!-- 引用分页模板 -->
-                    <!-- <div v-if="color_stasus!='index'&&color_stasus!='updateUserInfo'" class="footer">
-                       
-                        {% include 'page.html'%}
-                    </div> -->
-                   
                 </div>
                 <!-- 右侧的登录注册完善信息 -->
                 <div class="aside">
@@ -73,44 +67,69 @@
                             <a v-if="!userInfo.isAdmin" class="info">${ userInfo.username },你好！，欢迎光临西邮之家！</a>
                             
                             </p>
+                            <label for="">
+                                <span>昵称:</span>${ userInfo.nicheng }
+                            </label>
+                            <label for="">
+                                <span>性别:</span>${ userInfo.sex }
+                            </label>
+                            <label for="">
+                                <span>院系:</span>${ userInfo.faculty }
+                            </label>
+                            <label for="">
+                                <span>班级:</span>${ userInfo.Class }
+                            </label>
+                            <label for="">
+                                <span>dans:</span>${ userInfo.danshen }
+                            </label>
+                            <label for="">
+                                <span>简介:</span>${ userInfo.disc }
+                            </label>
                             <span  @click="color_stasus='updateUserInfo'"><router-link to='/updateUserInfo'  :class="{check:color_stasus==='updateUserInfo'}">完善个人信息</router-link></span>
                             
                             <p><a href="javascript:;" id="logout" @click="login_out()">退出登录</a></p>
                     </div>
                     
                     <div class="denglu" id="loginBox" v-if="login_stadus==='login'">
-                            <h2>登陆</h2>
+                            <div class="logo"></div>
                             <hr>
-                            <label for="">
-                                用户名：<input v-model="login_userInfo.username" type="text" name="d_username">
-                            </label>
-                            <br>
-                            <label for="">
-                                    密码：<input v-model="login_userInfo.password" type="password" name="d_password">
-                                </label>
-                                <br>
-                            <button @click="User_login()">登陆</button>
-                            <p>还没注册？<a href="javascript:;" class="cloMint" @click="login_stadus='register'">马上注册</a></p>
+                            <div class="form-item">
+                                <input v-model="login_userInfo.username" id="username" type="text" name="d_username" placeholder="用户名">
+                            </div>
+                            <div class="form-item">
+                                <input v-model="login_userInfo.password" id="password" type="password" name="d_password" placeholder="密码">
+                            </div>
+                            <div class="form-item">
+                                <button @click="User_login()">登陆</button>
+                            </div>
+                            <div class="reg-bar">
+                                还没注册？<a href="javascript:;" class="cloMint reg" @click="login_stadus='register'">马上注册</a>
+                            </div>
+                            <p></p>
                             <p class="info">${login_tip}</p>
                     </div>
                     <div class="denglu" id="registerBox" v-if="login_stadus==='register'">
+                            <div class="logo"></div>
                             <h2>注册</h2>
                             <hr>
-                            <label for="">
-                                用户名：<input v-model="register_userInfo.username" type="text" name="z_username">
-                            </label>
+                            <div class="form-item">
+                                <input v-model="register_userInfo.username" class="username" type="text" name="z_username" placeholder="用户名">
+                            </div>
+                            <div class="form-item">
+                                <input v-model="register_userInfo.password" class="pwd" type="password" name="z_password" placeholder="密码">
+                            </div>
+                            <div class="form-item">
+                                <input v-model="register_userInfo.repassword" class="pwd" type="password" name="z_repassword" placeholder="确认">
+                            </div>
+                            <div class="form-item">
+                                <button @click="User_resister()">注册</button>
+                            </div>
                             <br>
-                            <label for="">
-                                    密码：<input v-model="register_userInfo.password" type="password" name="z_password">
-                                </label>
-                            <br>
-                            <label for="">
-                                    确认：<input v-model="register_userInfo.repassword" type="password" name="z_repassword">
-                                </label>
-                                <br>
-                            <button @click="User_resister()">注册</button>
                             <p class="tip">${register_tip}</p>
-                            <p>已有账号<a href="javascript:;"  class="cloMint" @click="login_stadus='login'">马上登陆</a></p>
+                            <div class="reg-bar">
+                                已有账号<a href="javascript:;"  class="cloMint reg" @click="login_stadus='login'">马上登陆</a>
+                            </div>
+                            <p></p>
                     </div>
                 </div>
             </div>

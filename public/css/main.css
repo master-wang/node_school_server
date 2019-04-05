@@ -2,10 +2,12 @@
     margin: 0;
     padding: 0;
 }
-body{
+/* body{
     background: #ccc;
     overflow: hidden;
-}
+} */
+
+
 .top{
     width: 100%;
     height: 1014px;
@@ -75,15 +77,15 @@ body{
     top: 970px;
     width: 100%;
     height: 820px;
-    border: 1px solid #ccc;
-    background: #ccc;
+    height: 100%;
+    background: #fff url('../imgs/backgroud.png') 50% 50% no-repeat;
+    background-size: cover;
 }
 .article{
     float: left;
     margin-left:200px;
     width: 1000px;
     height: 650px;
-    border: 1px solid #ccc;
 }
 .article_main{
     width: 100%;
@@ -105,8 +107,87 @@ body{
 .denglu{
     margin-top: 10px;
     border:1px solid yellow;
-    background: white;
     padding: 10px;
+    width: 300px;
+    border: 1px solid #fff;
+    border-radius: 20px;
+}
+.logo {
+    width: 104px;
+    height: 120px;
+    margin: 10px auto 10px;
+    background: url('../imgs/login.png') 0 0 no-repeat;
+}
+.form-item placeholder {
+    color: rgb(255,157,0)!important;
+}
+.form-item input {
+    width: 230px;
+    height: 40px;
+    margin-top: 10px;
+    padding-left: 70px;
+    border: 1px solid #fff;
+    border-radius: 25px;
+    font-size: 18px;
+    color:  rgb(255,157,0);
+    background-color: transparent;
+    outline: none;
+}
+.reg-bar {
+    width: 360px;
+    margin: 20px auto 0;
+    font-size: 14px;
+    overflow: hidden;
+}
+.reg-bar .reg {
+    float: left;
+}
+
+.reg-bar a {
+    color: #fff;
+    text-decoration: none;
+}
+.aside a {
+    color: #fff;
+    text-decoration: none;
+}
+.form-item button {
+    width: 230px;
+    height: 40px;
+    border: 0;
+    margin-top: 10px;
+    border-radius: 25px;
+    font-size: 18px;
+    color: #1f6f4a;
+    outline: none;
+    cursor: pointer;
+    background-color: #fff;
+}
+#password , .pwd{
+    background: url("../imgs/password.png") 20px 6px no-repeat;
+}
+#username,.username{
+    background: url("../imgs/emil.png") 20px 6px no-repeat;
+}
+#UserIofo label{
+    width: 100%;
+    height: 40px;
+    line-height: 40px;
+    text-align: left;
+}
+#UserIofo label span{
+    float: left;
+    text-align: right;
+    width: 130px;
+    height: 30px;
+}
+.table{
+    color: aliceblue;
+}
+#classMate{
+    height: 600px;
+    width: 100%;
+    overflow-y:scroll;
 }
 .footer{
     margin-top: 10px;
@@ -270,7 +351,6 @@ textarea:focus {
 .box2-nav1 .message {
     width: 100%;
     height: 100%;
-    background-color: rgb(245, 243, 243);
 }
 .box2-nav1 .message img{
     width: 40px;
@@ -281,7 +361,7 @@ textarea:focus {
     display: inline-block
 }
 .box2-nav1 .message span{
-    width: 200px;
+    width: 80%;
     height: 60px;
     margin-right: 10px;
     margin-left: 10px;
@@ -297,12 +377,12 @@ textarea:focus {
 /* 我的代码 */
 .box2-nav1 .message .chatitem {
     width: 100%;
-    height: 60px;
     margin-top: 5px;
+    border:1px solid #ccc;
+    border-radius: 20px;
 }
 .box2-nav1 .message li{
     
-    height:50px;
     width: 100%;
     line-height: 60px;
 }
@@ -317,20 +397,19 @@ textarea:focus {
 /* 你的代码 */
 .box2-nav1 .message .left1 {
     float: left;
-    background-color: rgb(219, 210, 210);
+    color: rgb(63, 54, 54);
+    font-size: 28px;
+    text-align: left;
 }
 
 
-.box2-nav1 .message .left2 {
-    float: left;
-    width: 100px;
-   background-color: rgb(219, 210, 210);
-}
 
 .box2-nav1 .message  .right1 {
     float: right;
+    text-align: right;
     width: 100;
-  background-color: rgb(132, 187, 132);
+    font-size: 28px;
+    color: rgb(255,157,0);
 }
 .box2-nav1 .message .right2 {
     float: right;
@@ -419,10 +498,11 @@ textarea:focus {
     height: 40px;
     margin-right:10px;
     border-radius:50%;
-    top:18px;
+    margin-top: -30px;
 }.discuss input{
     right: 40px;
     width: 60px;
+    margin-top: -30px;
 }.new_discuss{
     margin-top: 35px;
     margin-bottom: 20px;
