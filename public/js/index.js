@@ -294,6 +294,7 @@ $(function(){
                         <td>{{user.from_user.danshen}}</td>
                         <td>
                             <button @click="agree_friends(user.from_user._id)" type="button" class="btn btn-info">同意好友请求</button>
+                            <button @click="reject_agr(user._id)" type="button" class="btn btn-danger">拒绝</button>
                         </td>
                     </tr>
                     </tfoot>
@@ -322,7 +323,8 @@ $(function(){
                 parerPage:5,
                 page : 1,
                 pages : 0,
-                fenyesuoying:[]
+                fenyesuoying:[],
+                timer:null,
             }
         },
         methods:{
@@ -334,6 +336,19 @@ $(function(){
                     success:function(result){
                         console.log(result)
                         that.hailsIdList=result.Hailsinfo;
+                    }
+                });
+            },
+            reject_agr(req_id){
+                var that = this;
+                console.log(req_id);
+                $.ajax({
+                    type:'get',
+                    url:'/api/user/FriendRequestnotAgree?req_id='+req_id,
+                    success:function(result){
+                        console.log(result)
+                        that.hailsIdList=result.Hailsinfo;
+                        that.$emit('agree',that.hailsIdList)
                     }
                 });
             },
@@ -411,8 +426,21 @@ $(function(){
             },
         },
         created() {
+            var that = this;
             this.userInfo=JSON.parse(localStorage.getItem('userInfo'));
-            this.request_Allhails();
+            //this.request_Allhails();
+            setTimeout(function(){
+                that.request_Allhails();
+            },100)
+            
+            this.timer = setInterval(function(){
+                that.request_Allhails();
+            },2000)
+            
+
+        },
+        destroyed(){
+            clearInterval(this.timer);
         }
     }
     var Hailchatinfo = {
@@ -550,7 +578,8 @@ $(function(){
             return {
                 userInfo:{},
                 hailsIdList:[],
-                user_click_color:''
+                user_click_color:'',
+                timer:null,
             }
         },
         methods:{
@@ -604,8 +633,17 @@ $(function(){
             }
         },
         created() {
+            var that = this;
             this.userInfo=JSON.parse(localStorage.getItem('userInfo'));
             this.request_Allhails();
+            this.timer = setInterval(function(){
+                that.request_Allhails();
+            },2000)
+            
+
+        },
+        destroyed(){
+            clearInterval(this.timer);
         }
     }
     var schoolFriends={
@@ -848,7 +886,7 @@ $(function(){
     }
     var boardAdd={
         template : `
-            <div style="color:white">
+            <div>
                 <h1>发布我的公告</h1>
                 <div>
                     <label for="" v-if="userInfo.isAdmin">
@@ -1187,7 +1225,7 @@ $(function(){
     }
     var updateUserInfo={
         template : `
-            <div style="color:white">
+            <div>
                 <h1>完善个人信息</h1>
                 <div>
                     

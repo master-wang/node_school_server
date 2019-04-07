@@ -437,10 +437,8 @@ router.get('/user/getAllHailsInfo',function(req,res){
         arr =arr1.concat(arr2);
         console.log(arr);
         responData.Hailsinfo = arr;
-        responData.Hailsinfo.forEach(function(item){
-            item.from_user.password = '尴尬';
-            item.to_user.password = '尴尬';
-        })
+        
+        
         res.json(responData);
     })
 })
@@ -456,6 +454,30 @@ router.get('/user/FriendRequestAgree',function(req,res){
         to_user:req.userInfo._id,
     },{
         isFirends:true
+    }).then(function(info){
+        console.log(info)
+        return Hails.find({from_user : req.userInfo._id}).populate(['from_user','to_user']);
+    }).then(function(Info){
+        arr1=Info;
+       
+        return Hails.find({to_user : req.userInfo._id}).populate(['from_user','to_user']);
+    }).then(function(Info){
+        arr2 = Info;
+        arr =arr1.concat(arr2);
+        console.log(arr);
+        responData.Hailsinfo = arr;
+        res.json(responData);
+    });
+})
+//不同意好友请求
+router.get('/user/FriendRequestnotAgree',function(req,res){
+    var req_id = req.query.req_id;
+    console.log(req_id);
+    var arr1 = [];
+    var arr2 = []
+    var arr = []
+    Hails.remove({
+        _id:req_id
     }).then(function(info){
         console.log(info)
         return Hails.find({from_user : req.userInfo._id}).populate(['from_user','to_user']);
